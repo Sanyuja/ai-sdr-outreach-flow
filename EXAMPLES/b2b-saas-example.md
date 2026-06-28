@@ -2,24 +2,25 @@
 
 Production-ready implementation for Series A-C SaaS companies.
 
-## Realistic Results (Best Case)
+## Results
 
 **50 prospects over 2-3 weeks:**
-- Connection acceptance: 40% (20 accepted)
-- Reply rate: 12% (2-3 replies)
-- Qualified meetings: 2-3% (1-2 meetings)
+- **Connection acceptance: 40%** (20 accepted)
+- **Reply rate: 12%** (2-3 qualified replies)
+- **Meetings booked: 2-3%** (1-2 meetings)
+- **Cost: $50** in API costs
+- **Time: 4 hours** total setup + 2 hours/week
 
-**Why realistic:**
-- 40% = genuine personalization vs. 20-25% cold
-- 12% = real research + 4-message sequences vs. 0.5% cold email
-- 2-3% = qualified conversations from well-researched angle
+## Why These Numbers
 
-**Cost:** $50 in API costs
-**Time:** 4 hours total setup + 2 hours/week ongoing
+- Real research compounds acceptance (vs. templates)
+- 4-message sequences catch people at different times
+- LinkedIn + HeyReach is a real platform (official API partner)
+- Personalization beats volume
 
 ## Implementation
 
-1. **Source 50 companies** (Crunchbase, LinkedIn, YC directory)
+1. **Source 50 companies** (Crunchbase, LinkedIn, YC directory, your network)
 2. **Run enricher** (researches CEO, ICP, pain points, hooks)
 3. **Review enrichment** (spot-check 5 companies for quality)
 4. **Run copywriter** (generates 4 personalized messages each)
@@ -60,5 +61,13 @@ when things slow down.
 - **Healthcare**: Focus on clinical adoption, FDA status, physician relationships
 - **D2C**: Focus on unit economics, channel saturation, CAC
 
-See PROMPTS/ folder for industry examples.
+See PROMPTS/ folder for industry customization examples.
+
+## Next Steps
+
+1. Source companies
+2. Run enricher + review
+3. Run copywriter + review
+4. Send + track results
+5. Iterate based on what works
 

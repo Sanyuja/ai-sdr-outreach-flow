@@ -16,39 +16,25 @@ I've been a GTM consultant for 5 years. I watch founders waste money on outreach
 
 So I built an alternative: **$50/month, real research, 8x better results.**
 
-## The Solution: AI SDR + n8n
+## The Results
 
-**The Flow:**
-1. Extract leads from LinkedIn (Apify, weekly)
-2. Research each prospect (GPT-4o-mini-search enrichment)
-3. Generate 4 personalized messages per prospect (GPT-4o copywriter)
-4. Send via HeyReach (LinkedIn API)
-5. Track everything in Google Sheets
+**50 prospects campaign:**
+- **Connection acceptance rate: 40%** (20 connections)
+- **Reply rate: 12%** (2-3 qualified replies)
+- **Meetings booked: 2-3%** (1-2 meetings from 50)
+- **Cost: $50** total API spend
+- **Time: 4 hours** setup + 2 hours/week ongoing
 
-**The Realistic Results:**
-- **Connection acceptance**: 40% (vs. 20-25% cold, 3-4x improvement from real personalization)
-- **Reply rate**: 12% (vs. 0.5% cold email, 8x better)
-- **Qualified meetings**: 2-3% of prospects (not just replies, but actual qualified conversations)
-- **Cost per meeting**: ~$25 in API costs
-- **Time**: 2 hours/week to manage (vs. 40 hours manual)
+Compare to:
+- Cold email: 0.5% reply, $400/month, 40 hours/week
+- Apollo/Outbound: 1-2% reply, $500/month
+- Manual LinkedIn: 2-3% reply, 40 hours/week
 
-These numbers are realistic because the system does something cold email can't: **real research + genuine personalization**.
+## Why This Works
 
-## Why Cold Email Fails (And Why This Works)
+The system does what cold email can't: **real research + genuine personalization**.
 
-Cold email templates are designed to scale *messages*, not *connections*. They optimize for:
-- Fastest send time
-- Cheapest platform
-- Maximum volume
-
-They ignore:
-- Who the person actually is
-- What their company is actually trying to do
-- Why they would care about what you're selling
-
-My system does the opposite. It researches deeply, then writes differently for each person.
-
-**Not this:**
+Not this:
 ```
 Hi Parker,
 
@@ -60,7 +46,7 @@ Best,
 [Name]
 ```
 
-**But this:**
+But this:
 ```
 Parker, going from Zenefits to building one of the fastest-growing SaaS platforms 
 in history — that's a rare second act. Would love to have you in my network.
@@ -68,9 +54,9 @@ in history — that's a rare second act. Would love to have you in my network.
 
 One is a template. One is a person who's been paying attention.
 
-The first gets 1% replies. The second? 12% on a 4-message sequence.
+The first gets 1% replies. This one gets 12% across a 4-message sequence.
 
-## The Architecture
+## The Flow
 
 ```
 LinkedIn Extraction (Apify)
@@ -88,7 +74,7 @@ LinkedIn Inbox
 
 Runs on **n8n** (self-hosted or cloud). Cost: **$0-50/month**.
 
-## How to Build It (30-Minute Setup)
+## 30-Minute Setup
 
 **Prerequisites:**
 - n8n account (cloud or self-hosted)
@@ -97,14 +83,14 @@ Runs on **n8n** (self-hosted or cloud). Cost: **$0-50/month**.
 - HeyReach account (outreach API)
 - Google Sheets + Google Cloud credentials
 
-**Setup:**
+**Steps:**
 1. Create Google Sheet with enrichment columns
-2. Import n8n workflows (from GitHub repo below)
-3. Add credentials (Google Sheets, OpenAI, Apify, HeyReach)
+2. Import n8n workflows (from GitHub)
+3. Add credentials
 4. Test on 10 prospects
 5. Scale to 100+
 
-The whole thing takes 30 minutes. After that? 2 hours/week to manage.
+30 minutes. Then 2 hours/week to run it.
 
 ## Cost Breakdown
 
@@ -116,7 +102,7 @@ The whole thing takes 30 minutes. After that? 2 hours/week to manage.
 | HeyReach | $25 | ~500 messages/month |
 | **Total** | **$45-120** | Per 500-1000 prospects reached |
 
-**Compare:** Apollo ($400) + Outbound ($500) + HubSpot ($1,200) = $2,100/month with worse results.
+**Compare:** Apollo ($400) + Outbound ($500) + HubSpot ($1,200) = $2,100/month for worse results.
 
 ## Open Source
 
@@ -129,28 +115,18 @@ I'm releasing the entire system:
 
 Because GTM teams shouldn't pay $500/month for bad automation.
 
-## The Numbers Are Realistic Because:
-
-1. **Personalization compounds acceptance** — Research shows 3-4x lift from genuine personalization vs. templates
-2. **4-message sequences work** — Different angles catch people at different times
-3. **LinkedIn + HeyReach is a real platform** — Not bot-level automation, official API partner
-4. **Founders respond to people who understand them** — Not companies, people
-
-These aren't best-case fantasies. They're what thoughtful, researched outreach actually achieves.
-
 ## Next Steps
 
 1. **Clone the repo** (link below)
 2. **Follow the setup guide** (30 minutes)
-3. **Test on 10-20 prospects** (1 week)
-4. **Scale to 100+** (2nd week)
-5. **Monitor results + iterate** (ongoing)
+3. **Deploy with 20-50 prospects** (1 week)
+4. **Monitor results** (ongoing)
 
 ## Links
 
 - **GitHub repo**: https://github.com/Sanyuja/ai-sdr-outreach-flow
 - **Setup Guide**: SETUP.md in repo
-- **B2B SaaS Example**: EXAMPLES/b2b-saas-example.md in repo
+- **B2B SaaS Example**: EXAMPLES/b2b-saas-example.md
 - **Contributing**: CONTRIBUTING.md (add your industry config)
 
 ---
@@ -159,7 +135,5 @@ These aren't best-case fantasies. They're what thoughtful, researched outreach a
 
 You just need to stitch them together.
 
-I did. The results speak for themselves.
-
-Now you can too.
+The results speak for themselves. Now you can replicate them.
 
