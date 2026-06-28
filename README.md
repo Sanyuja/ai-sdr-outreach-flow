@@ -1,167 +1,111 @@
-# AI SDR Outreach Flow
+# AI-Assisted Outreach Workflow (with Guardrails)
 
-An open-source, industry-agnostic AI SDR (Sales Development Representative) system that automates lead research, intelligent message generation, and scaled LinkedIn outreach. Built with n8n, GPT-4, Apify, and HeyReach.
+An open-source, industry-agnostic outreach system that researches prospects, drafts personalized LinkedIn sequences, and sends at scale — **with explicit human-review gates and quality controls**, so automation doesn't become spam-at-scale.
 
-**Current Example:** B2B SaaS Founder Outreach
+Built with n8n, GPT-4, Apify, and HeyReach. **Current example:** B2B SaaS founder outreach.
 
-## Results
+> The automation is the easy part. The system is the controls. This repo is as much about *where a human stays in the loop* and *what the model is not allowed to do* as it is about the AI.
 
-- **Connection acceptance rate: 40%** (vs. 20-25% cold)
-- **Reply rate: 12%** (vs. 0.5% cold email, 8x better)
-- **Meetings booked: 2-3%** of prospects
-- **Cost: $50/month** (vs. $500+/month SaaS)
-- **Time: 4 hours setup + 2 hours/week** (vs. 40 hours manual)
+## System at a Glance
+
+```mermaid
+flowchart TD
+    A[LinkedIn Extraction<br/>Apify] --> B[(Google Sheet)]
+    B --> C{Filter:<br/>valid + not enriched}
+    C --> D[Enrichment · GPT-4o-mini]
+    D --> E[ICP · Pain · Hook · Founder]
+    E --> G1{{HUMAN GATE 1<br/>check research}}
+    G1 -->|rejected| D
+    G1 -->|approved| F[Message Gen · GPT-4o]
+    F --> H[4-message sequence]
+    H --> G2{{HUMAN GATE 2<br/>review before send}}
+    G2 -->|rejected| F
+    G2 -->|approved| I[Batch of 25 · dedup]
+    I --> J[HeyReach] --> K[LinkedIn inbox]
+    K --> L[Reply + outcome metrics]
+    L -.feedback loop.-> F
+```
+
+**Full design — inputs, outputs, every failure mode mapped to its guardrail, and the metrics I track — is in [ARCHITECTURE.md](ARCHITECTURE.md).**
+
+## What Makes This a System, Not a Demo
+
+- **Two human-review gates**, placed by cost: a cheap rejection point *before* the expensive model runs, and a final approval *before* anything reaches an inbox. Both surfaced in the Google Sheet so a non-technical reviewer can approve without touching n8n.
+- **Guardrails against the model's bad habits** — no fabricated facts (person/date/$ it can't support), no em dashes, a banned-pattern list so every message doesn't collapse into the same opener.
+- **Quality-first metrics** — the headline number is **false-positive outreach rate** (wrong person / wrong fit), optimized *down*. Volume is a vanity metric.
+- **Industry-agnostic** — swap the config and prompts; the control structure stays.
 
 ## What It Does
 
-1. **Extracts leads** from LinkedIn using Apify (weekly schedule, customizable criteria)
-2. **Enriches prospects** with AI-powered research (funding, ICP, pain points, founder details)
-3. **Generates 4-message sequences** tailored to each founder (connection request, first message, two nudges)
-4. **Sends via HeyReach** in batches of 25
-5. **Tracks everything** in a Google Sheet for monitoring and iteration
+1. **Extracts leads** from LinkedIn via Apify (weekly, customizable criteria)
+2. **Enriches prospects** with AI research — funding, ICP, pain point, founder detail
+3. **Generates a 4-message sequence** grounded in the research, not a template
+4. **Routes through two human gates** before anything sends
+5. **Sends via HeyReach** in batches of 25, deduplicated
+6. **Tracks outcomes** for the quality metrics and feedback loop
 
 ## Quick Start
 
-### Prerequisites
-- n8n account + self-hosted or cloud instance
-- Google Sheets API access
-- OpenAI API key (GPT-4o-mini or better)
-- Apify account + LinkedIn scraper actor
-- HeyReach account + API key
-
-### Setup (30 minutes)
+```
 1. Clone this repo
-2. Copy the two JSON flows (`FLOWS/`) into your n8n instance
-3. Follow [SETUP.md](SETUP.md) for credential configuration
-4. Customize the B2B SaaS config for your use case (or choose a different industry from CONFIGS/)
-5. Import your prospect list or connect Apify to extract leads
+2. Import FLOWS/*.json into n8n
+3. Follow SETUP.md (credentials + replace placeholders)
+4. Pick CONFIGS/b2b-saas-config.json or adapt for your industry
+5. Test on 10 prospects through both gates before scaling
+```
 
-### For B2B SaaS
-See [EXAMPLES/b2b-saas-example.md](EXAMPLES/b2b-saas-example.md) for a complete walkthrough.
+Full walkthrough: [EXAMPLES/b2b-saas-example.md](EXAMPLES/b2b-saas-example.md).
 
 ## Project Structure
 
 ```
 ai-sdr-outreach-flow/
-├── FLOWS/
-│   ├── 1-enricher.json          # Research + enrich prospects
-│   ├── 2-linkedin-outreach.json # Generate messages + send
-│   └── README.md                # Flow architecture
-├── CONFIGS/
-│   ├── b2b-saas-config.json     # B2B SaaS example
-│   ├── enterprise-config.json   # Enterprise sales template
-│   ├── d2c-config.json          # D2C template
-│   └── CONFIG_TEMPLATE.md       # How to create custom config
-├── PROMPTS/
-│   ├── enricher-prompt.md       # AI research instructions
-│   └── README.md                # When + how to customize
-├── INTEGRATIONS/
-│   ├── apify-setup.md           # LinkedIn extraction setup
-│   ├── heyreach-setup.md        # HeyReach API setup
-│   └── google-sheets-setup.md   # Sheet structure + API
-├── EXAMPLES/
-│   └── b2b-saas-example.md      # Complete B2B SaaS guide
-├── SETUP.md                     # Step-by-step installation
-├── LICENSE                      # MIT
-└── CONTRIBUTING.md              # Community contributions
+├── ARCHITECTURE.md         # System design, failure points, guardrails, metrics
+├── FLOWS/                  # Two n8n workflows (enricher + outreach)
+├── CONFIGS/                # Industry templates (B2B SaaS, Enterprise, D2C...)
+├── PROMPTS/                # Enricher + copywriter prompts (customizable)
+├── INTEGRATIONS/           # Apify, HeyReach, Google Sheets setup
+├── EXAMPLES/               # B2B SaaS end-to-end walkthrough
+├── MEDIUM_ARTICLE.md       # Long-form write-up
+├── LINKEDIN_POST.md        # Short-form post drafts
+└── SETUP.md                # Step-by-step installation
 ```
 
-## How It Works
+## Metrics I Track (and Why)
 
-```
-LinkedIn Extraction (Apify)
-    ↓ Company names
-Enrichment (GPT-4o-mini-search)
-    ↓ CEO, ICP, Pain point, Hook, Founder detail
-Message Generation (GPT-4o)
-    ↓ 4 personalized messages per prospect
-Google Sheet (tracking + review)
-    ↓ Manual approval or auto-send
-HeyReach API
-    ↓ Connection requests + follow-up messages
-LinkedIn Inbox
-```
+| Metric | Why it matters |
+|--------|----------------|
+| **Personalization accuracy** | Proves the "research beats templates" thesis — or kills it |
+| **Enrichment accuracy** | Garbage in → confidently wrong outreach |
+| **False-positive outreach rate** | The reputational-risk metric. Driven *down*, not sends up |
+| **Connection acceptance / positive-reply rate** | Outcome signal — but secondary to quality |
+| **Review time per batch** | Tells you if the guardrails are sustainable |
 
-## Key Features
+Most are **sampled audits**, not counters — quality is judged, not just counted. Details in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-✅ **Real research** — not templates. Each prospect gets uniquely researched and personalized messaging
-✅ **4-message sequences** — connection request, first message, first nudge, second nudge
-✅ **Weekly extraction** — automatically pull new leads from LinkedIn via Apify
-✅ **Batched sending** — send 25 prospects at a time to stay within API limits
-✅ **Full tracking** — Google Sheet shows research, messages, send status, and engagement
-✅ **Industry-agnostic** — templates for B2B SaaS, Enterprise, Healthcare, D2C, Compliance
-✅ **Open source** — $0 platform cost (just API fees: ~$50/month)
+## What I'd Improve Next
 
-## Cost Breakdown
+- Automated enrichment validation (cross-check CEO LinkedIn ↔ company domain; flag low-confidence so humans review only the uncertain records)
+- A pre-generation fit score to skip low-ICP-fit prospects before spending GPT-4o tokens
+- Reply classification to close the feedback loop automatically
+- Opening-line A/B testing + feeding winning patterns back into the prompt
+
+The honest place to leave a project is "gets better," not "done."
+
+## Cost
 
 | Tool | Cost | Purpose |
 |------|------|---------|
-| n8n | $0-50 | Workflow orchestration |
-| OpenAI API | $20-40 | Research + message generation |
-| Apify | $0-5 | LinkedIn lead extraction |
-| HeyReach | $25 | LinkedIn outreach API |
-| **Total** | **$45-120/month** | For 500-1000 prospects/month |
-
-**Compare:** Apollo ($400) + Outbound ($500) + HubSpot ($1,200) = $2,100/month for worse results
-
-## Customization by Industry
-
-Each industry needs different enrichment fields and message angles:
-
-| Industry | Focus | Hook angles |
-|----------|-------|-------------|
-| **B2B SaaS** | Buyer reaching, GTM challenges | Funding rounds, growth rate, customer logos |
-| **Enterprise** | Procurement, multi-stakeholder | Infrastructure fit, compliance, integrations |
-| **Healthcare** | Clinical adoption, regulatory | FDA status, clinical validation, partnerships |
-| **D2C** | Channel saturation, unit economics | Channel strength, customer LTV, brand momentum |
-| **Compliance** | Regulatory exposure | Enforcement trends, competitive advantage |
-
-See [CONFIGS/](CONFIGS/) for examples and [PROMPTS/](PROMPTS/) for how to customize.
-
-## Getting Started
-
-1. **Clone the repo**
-2. **Read [SETUP.md](SETUP.md)** (30-minute setup)
-3. **Pick an industry config** (or customize for yours)
-4. **Test with 10-20 prospects**
-5. **Deploy and monitor results**
-6. **Iterate based on what works**
-
-## Results You Should Expect
-
-**50 prospects campaign (B2B SaaS example):**
-- Connection acceptance: 40%
-- Replies to first message: 12%
-- Qualified meetings: 2-3%
-- Time invested: 4 hours setup + 2 hours/week
-- Cost: $50 in API fees
+| n8n | $0–50 | Orchestration (self-hosted = $0) |
+| OpenAI API | $20–40 | Research + generation |
+| Apify | $0–5 | Lead extraction |
+| HeyReach | $25 | LinkedIn sending |
+| **Total** | **$45–120/mo** | for 500–1000 prospects |
 
 ## Contributing
 
-Have an industry config to share? See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-We welcome configurations for new industries and improvements to the core flows.
-
-## License
-
-MIT. Use freely, credit appreciated.
-
-## Resources
-
-- [Setup Guide](SETUP.md) — Complete installation walkthrough
-- [B2B SaaS Example](EXAMPLES/b2b-saas-example.md) — Full implementation walkthrough
-- [Flow Architecture](FLOWS/README.md) — Detailed node breakdown
-- [Integration Guides](INTEGRATIONS/) — Apify, HeyReach, Google Sheets setup
-
-## Questions?
-
-Open an issue on GitHub or check [SETUP.md](SETUP.md) troubleshooting section.
+Industry config to share? See [CONTRIBUTING.md](CONTRIBUTING.md). License: MIT.
 
 ---
 
-**The technology exists today.** GPT-4 can research. n8n can orchestrate. HeyReach can send.
-
-You just need to stitch them together.
-
-This repo shows you exactly how.
-
+If you're building in this space, I'd rather compare notes on **controls and quality measurement** than send volume. That's where the interesting problems are.
