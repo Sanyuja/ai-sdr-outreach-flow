@@ -1,0 +1,94 @@
+<svg viewBox="0 0 780 760" xmlns="http://www.w3.org/2000/svg" role="img" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <title>AI-assisted outreach system architecture</title>
+  <desc>A vertical pipeline: Apify extraction feeds a Google Sheet, then GPT enrichment, a human review gate, GPT message generation, a second human review gate, HeyReach sending, and outcome metrics that feed back into message generation. Human gates are highlighted as the key control points.</desc>
+
+  <style>
+    .box { fill: #ffffff; stroke: #d4d4d8; stroke-width: 1.5; }
+    .auto { fill: #f4f4f5; stroke: #d4d4d8; }
+    .store { fill: #eef2ff; stroke: #c7d2fe; }
+    .gate { fill: #fff7ed; stroke: #fb923c; stroke-width: 2.5; }
+    .title { fill: #18181b; font-size: 15px; font-weight: 650; }
+    .sub { fill: #71717a; font-size: 12px; }
+    .gtitle { fill: #9a3412; font-size: 15px; font-weight: 700; }
+    .gsub { fill: #c2410c; font-size: 12px; font-weight: 500; }
+    .flow { stroke: #a1a1aa; stroke-width: 2; fill: none; }
+    .feedback { stroke: #fb923c; stroke-width: 2; fill: none; stroke-dasharray: 5 4; }
+    .reject { stroke: #ef4444; stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; }
+    .lbl { fill: #71717a; font-size: 11px; }
+    .rlbl { fill: #ef4444; font-size: 11px; }
+  </style>
+
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M1,1 L7,4.5 L1,8" fill="none" stroke="#a1a1aa" stroke-width="2"/>
+    </marker>
+    <marker id="arrO" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M1,1 L7,4.5 L1,8" fill="none" stroke="#fb923c" stroke-width="2"/>
+    </marker>
+  </defs>
+
+  <!-- legend -->
+  <rect x="500" y="20" width="14" height="14" rx="3" class="auto"/>
+  <text x="520" y="32" class="lbl">Automated step</text>
+  <rect x="500" y="42" width="14" height="14" rx="3" class="gate"/>
+  <text x="520" y="54" class="lbl">Human review gate</text>
+
+  <!-- connectors -->
+  <path class="flow" d="M390,86 L390,116" marker-end="url(#arr)"/>
+  <path class="flow" d="M390,176 L390,206" marker-end="url(#arr)"/>
+  <path class="flow" d="M390,266 L390,296" marker-end="url(#arr)"/>
+  <path class="flow" d="M390,366 L390,396" marker-end="url(#arr)"/>
+  <path class="flow" d="M390,456 L390,486" marker-end="url(#arr)"/>
+  <path class="flow" d="M390,556 L390,586" marker-end="url(#arr)"/>
+  <path class="flow" d="M390,646 L390,676" marker-end="url(#arr)"/>
+
+  <!-- reject loops -->
+  <path class="reject" d="M270,332 C150,332 150,236 268,236" marker-end="url(#arr)"/>
+  <text x="120" y="288" class="rlbl">reject</text>
+  <path class="reject" d="M270,522 C150,522 150,426 268,426" marker-end="url(#arr)"/>
+  <text x="120" y="478" class="rlbl">reject</text>
+
+  <!-- feedback loop -->
+  <path class="feedback" d="M510,705 C660,705 660,426 512,426" marker-end="url(#arrO)"/>
+  <text x="600" y="570" class="gsub">feedback loop</text>
+
+  <!-- Apify -->
+  <rect x="270" y="36" width="240" height="50" rx="9" class="auto"/>
+  <text x="390" y="58" text-anchor="middle" class="title">Apify Extraction</text>
+  <text x="390" y="76" text-anchor="middle" class="sub">weekly LinkedIn pull</text>
+
+  <!-- Sheet -->
+  <rect x="270" y="126" width="240" height="50" rx="9" class="store"/>
+  <text x="390" y="148" text-anchor="middle" class="title">Google Sheet</text>
+  <text x="390" y="166" text-anchor="middle" class="sub">data store + review surface</text>
+
+  <!-- Enrichment -->
+  <rect x="270" y="216" width="240" height="50" rx="9" class="auto"/>
+  <text x="390" y="238" text-anchor="middle" class="title">Enrichment · GPT-4o-mini</text>
+  <text x="390" y="256" text-anchor="middle" class="sub">ICP · pain · hook · founder</text>
+
+  <!-- GATE 1 -->
+  <rect x="270" y="306" width="240" height="50" rx="9" class="gate"/>
+  <text x="390" y="328" text-anchor="middle" class="gtitle">Human Gate 1</text>
+  <text x="390" y="346" text-anchor="middle" class="gsub">check research accuracy</text>
+
+  <!-- Message Gen -->
+  <rect x="270" y="396" width="240" height="50" rx="9" class="auto"/>
+  <text x="390" y="418" text-anchor="middle" class="title">Message Gen · GPT-4o</text>
+  <text x="390" y="436" text-anchor="middle" class="sub">4-message sequence</text>
+
+  <!-- GATE 2 -->
+  <rect x="270" y="486" width="240" height="50" rx="9" class="gate"/>
+  <text x="390" y="508" text-anchor="middle" class="gtitle">Human Gate 2</text>
+  <text x="390" y="526" text-anchor="middle" class="gsub">review before send</text>
+
+  <!-- HeyReach -->
+  <rect x="270" y="586" width="240" height="50" rx="9" class="auto"/>
+  <text x="390" y="608" text-anchor="middle" class="title">HeyReach Send</text>
+  <text x="390" y="626" text-anchor="middle" class="sub">batches of 25 · deduped</text>
+
+  <!-- Metrics -->
+  <rect x="270" y="676" width="240" height="50" rx="9" class="auto"/>
+  <text x="390" y="698" text-anchor="middle" class="title">Outcome Metrics</text>
+  <text x="390" y="716" text-anchor="middle" class="sub">false-positive rate · replies</text>
+</svg>
