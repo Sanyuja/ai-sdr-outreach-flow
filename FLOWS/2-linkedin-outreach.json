@@ -20,10 +20,10 @@
         "operation": "update",
         "documentId": {
           "__rl": true,
-          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "value": "[YOUR_GOOGLE_SHEET_ID]",
           "mode": "list",
           "cachedResultName": "AI SDR prospect list",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/[YOUR_GOOGLE_SHEET_ID]/edit"
         },
         "sheetName": {
           "__rl": true,
@@ -169,10 +169,10 @@
         "operation": "update",
         "documentId": {
           "__rl": true,
-          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "value": "[YOUR_GOOGLE_SHEET_ID]",
           "mode": "list",
           "cachedResultName": "AI SDR prospect list",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/[YOUR_GOOGLE_SHEET_ID]/edit"
         },
         "sheetName": {
           "__rl": true,
@@ -363,17 +363,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "value": "[YOUR_GOOGLE_SHEET_ID]",
           "mode": "list",
           "cachedResultName": "AI SDR prospect list",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/[YOUR_GOOGLE_SHEET_ID]/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": "gid=0",
           "mode": "list",
           "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit#gid=0"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/[YOUR_GOOGLE_SHEET_ID]/edit#gid=0"
         },
         "options": {}
       },
