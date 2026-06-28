@@ -32,7 +32,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "ekmfU0LHEc23MImX",
-          "name": "Google Sheets account sanyuja"
+          "name": "[YOUR_GOOGLE_SHEETS_CREDENTIAL]"
         }
       }
     },
@@ -383,7 +383,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "ekmfU0LHEc23MImX",
-          "name": "Google Sheets account sanyuja"
+          "name": "[YOUR_GOOGLE_SHEETS_CREDENTIAL]"
         }
       }
     },
