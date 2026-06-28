@@ -1,0 +1,5917 @@
+{
+  "name": "AI SDR — LinkedIn Outreach",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const content = $input.item.json?.message?.content ?? {};\nconst now = new Date().toISOString().split('T')[0];\n\nreturn {\n  json: {\n    Organization_name: content.Organization_name || '',\n    CEO_LinkedIn: content.CEO_LinkedIn || '',\n    CEO_First_name: content.CEO_First_name || '',\n    CEO_Last_name: content.CEO_Last_name || '',\n    LinkedIn_message: content.connection_request || '',\n    First_message: content.first_message || '',\n    First_nudge: content.first_nudge || '',\n    Second_nudge: content.second_nudge || '',\n    message_stage: 'connection_request_generated',\n    messages_generated_date: now\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        1024
+      ],
+      "id": "92f89b9e-694f-4e6b-926b-4e360306025d",
+      "name": "Parse Message"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "mode": "list",
+          "cachedResultName": "AI SDR prospect list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Organization_name": "={{ $json.Organization_name }}",
+            "LinkedIn_message": "={{ $json.LinkedIn_message }}",
+            "First_message": "={{ $json.First_message }}",
+            "First_nudge": "={{ $json.First_nudge }}",
+            "Second_nudge": "={{ $json.Second_nudge }}",
+            "message_stage": "={{ $json.message_stage }}",
+            "messages_generated_date": "={{ $json.messages_generated_date }}"
+          },
+          "matchingColumns": [
+            "Organization_name"
+          ],
+          "schema": [
+            {
+              "id": "Organization_name",
+              "displayName": "Organization_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn_message",
+              "displayName": "LinkedIn_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First_message",
+              "displayName": "First_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First_nudge",
+              "displayName": "First_nudge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Second_nudge",
+              "displayName": "Second_nudge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message_stage",
+              "displayName": "message_stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "messages_generated_date",
+              "displayName": "messages_generated_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1600,
+        1040
+      ],
+      "id": "3927167a-10c4-48ba-bfd5-80cd00553da1",
+      "name": "Update LinkedIn Message",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ekmfU0LHEc23MImX",
+          "name": "Google Sheets account sanyuja"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heyreach.io/api/public/campaign/AddLeadsToCampaign",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "XCSwNyTJXDDALDaNGQL53rNXd1rJ5dw+Xep4Vf28NUY="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ CampaignId: 481704, AccountLeadPairs: [{ AccountId: 110697, Lead: { ProfileUrl: $('Parse Message').item.json.CEO_LinkedIn, FirstName: $('Parse Message').item.json.CEO_First_name, LastName: $('Parse Message').item.json.CEO_Last_name }, CustomNote: $('Parse Message').item.json.LinkedIn_message }] }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        1040
+      ],
+      "id": "453c8bb8-48f0-4f49-909a-355f0e6edcd7",
+      "name": "Send to HeyReach"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "mode": "list",
+          "cachedResultName": "AI SDR prospect list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Organization_name": "={{ $('Parse Message').item.json.Organization_name }}",
+            "Sent_to_HeyReach": "true",
+            "sent_to_heyreach_date": "={{ new Date().toISOString().split('T')[0] }}",
+            "message_stage": "connection_request_sent"
+          },
+          "matchingColumns": [
+            "Organization_name"
+          ],
+          "schema": [
+            {
+              "id": "Organization_name",
+              "displayName": "Organization_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sent_to_HeyReach",
+              "displayName": "Sent_to_HeyReach",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sent_to_heyreach_date",
+              "displayName": "sent_to_heyreach_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message_stage",
+              "displayName": "message_stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2032,
+        1056
+      ],
+      "id": "184c2ebf-b178-4730-b3ba-e283b69fadd1",
+      "name": "Mark Sent in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ekmfU0LHEc23MImX",
+          "name": "Google Sheets account sanyuja"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "filter-ceo-linkedin",
+              "leftValue": "={{ $json.CEO_LinkedIn }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "filter-not-sent",
+              "leftValue": "={{ $json.Sent_to_HeyReach }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "filter-has-hook",
+              "leftValue": "={{ $json.Hook }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        1248
+      ],
+      "id": "667aba99-c145-4f84-bd29-8aa1f74d2fab",
+      "name": "Filter: Has LinkedIn + Not Sent1"
+    },
+    {
+      "parameters": {
+        "batchSize": 25,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        672,
+        1248
+      ],
+      "id": "2ee7aa86-10c8-4775-84c6-fac5bbe0f661",
+      "name": "Loop Over Prospects"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a cold outreach writer for Erica, a GTM consultant who builds custom AI SDR systems in n8n. Your job is to write LinkedIn DMs that feel like they came from someone who genuinely researched this specific founder — not just their company. The message should feel warm, human, and like Erica has been paying attention to this person for a while. Tone: casual, confident, a little impressed but never sycophantic. No exclamation points. No em dashes. No fluff. No generic openers like 'I noticed your company' or 'I came across your work'.\n",
+              "role": "system"
+            },
+            {
+              "content": "=Write four personalized LinkedIn messages from Erica to this founder. All four should feel like a real, evolving conversation — coherent, warm, and never repetitive. Each message should add something new rather than restate what came before.\n\nCEO: {{ $json.CEO_First_name }} {{ $json.CEO_Last_name }}\nCompany: {{ $json.Organization_name }}\nFounder detail (use to personalize — it's about the person): {{ $json.Founder_detail }}\nHook (non-obvious company insight): {{ $json.Hook }}\nCompany description (use to understand their ICP and buyers): {{ $json.Description }}\n\nMESSAGE 1 — connection_request (STRICT: under 300 characters total, including spaces):\nThis is the note attached to a LinkedIn connection request. Lead with something specific about the FOUNDER (use Founder_detail) — sound like you've been following them, not just did a quick search. Weave in the Hook naturally as an extension of who they are. End with a soft one-line CTA like 'open to connect'. First name only. Never start with 'I'. No exclamation points. No em dashes.\n\nMESSAGE 2 — first_message (sent after they accept the connection):\nThis message has one job: make them feel like Erica already understands their business and has built something specifically for them. Use Description to identify exactly who their buyers are — name them specifically (e.g. 'CFOs at mid-market SaaS companies' or 'procurement leads at logistics firms'). Then say Erica built a custom AI SDR system that finds and reaches exactly that type of buyer automatically — and that she can build the same for them. Make it feel like the ICP call-out is the hook, not the AI pitch. The AI SDR is the solution to the ICP problem they already know they have. 2–3 short sentences. Direct, warm, zero fluff. Never start with 'I'.\n\nMESSAGE 3 — first_nudge (gentle follow-up if no reply to first_message):\nTry a completely different angle — don't repeat anything from messages 1 or 2. Maybe ask a genuine question about their current outreach approach, or name a pain point founders in their space typically face. Under 3 lines. Low pressure, no urgency.\n\nMESSAGE 4 — second_nudge (last attempt):\nVery short — 1 to 2 lines max. Acknowledge they're probably slammed. One fresh thought: either a result Erica has seen, an easy question, or just an open door. Make it easy to say yes or no.\n\nRules for all messages: First name only. No exclamation points. No em dashes. No fluff. No generic openers like 'I noticed' or 'I came across'. Never start with 'I'.\n\nReturn strictly as JSON (no markdown, no extra text):\n{\n  \"Organization_name\": \"{{ $json.Organization_name }}\",\n  \"CEO_LinkedIn\": \"{{ $json.CEO_LinkedIn }}\",\n  \"CEO_First_name\": \"{{ $json.CEO_First_name }}\",\n  \"CEO_Last_name\": \"{{ $json.CEO_Last_name }}\",\n  \"connection_request\": \"...\",\n  \"first_message\": \"...\",\n  \"first_nudge\": \"...\",\n  \"second_nudge\": \"...\"\n}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        944,
+        1168
+      ],
+      "id": "5fb35fb0-b7b0-4361-bfed-134dacfc2a24",
+      "name": "Layer 2 — Copywriter1",
+      "credentials": {
+        "openAiApi": {
+          "id": "TA3VNMaLGGHjufVV",
+          "name": "Erica's OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "mode": "list",
+          "cachedResultName": "AI SDR prospect list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        1248
+      ],
+      "id": "28b03dcf-4ce7-40a9-9d6d-4a7f4e32e33b",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ekmfU0LHEc23MImX",
+          "name": "Google Sheets account sanyuja"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Get row(s) in sheet": [
+      {
+        "json": {
+          "row_number": 2,
+          "Organization_name": "Rippling",
+          "CEO_First_name": "Parker",
+          "CEO_Last_name": "Conrad",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/parkerconrad",
+          "Description": "Rippling is a workforce management platform that unifies HR, IT, finance, and more, allowing businesses to execute more efficiently.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series F",
+          "Last_funding_date": "2025-05-12",
+          "Hook": "Rippling has a really unusual commitment to R&D among SaaS tech companies, spending an enormous amount on developing new products and building new software.",
+          "Founder_detail": "Parker Conrad, the CEO and co-founder of Rippling, previously founded Zenefits and Wikinvest.",
+          "LinkedIn_message": "Rippling's $1.2 billion in funding shows serious trust from top investors. I built an AI SDR system that found you, and I can create a tailored version for your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": "rippling.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 3,
+          "Organization_name": "DualEntry",
+          "CEO_First_name": "Santiago",
+          "CEO_Last_name": "Nestares",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/santiago-nestares",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Santiago, I noticed DualEntry is tackling some unique challenges in finance automation. I built an AI SDR that found you and I can create something similar tailored for your ideal client profile. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 4,
+          "Organization_name": "Factory",
+          "CEO_First_name": "Matan",
+          "CEO_Last_name": "Grinberg",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/matan-grinberg-12345678",
+          "Description": "Factory is an AI startup building autonomous coding agents to automate software engineering tasks.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series C",
+          "Last_funding_date": "2026-04-16",
+          "Hook": "Factory's platform, powered by AI-driven agents called Droids, automates the full software engineering lifecycle, enabling teams to ship faster and improve code quality.",
+          "Founder_detail": "Matan Grinberg, the CEO and founder of Factory, previously worked at Berkeley Lab and the Institute for Advanced Study.",
+          "LinkedIn_message": "Scaling sales in a competitive market is tough. I built an AI SDR that found you and can create one tailored to your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": "factory.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 5,
+          "Organization_name": "OpenEvidence",
+          "CEO_First_name": "Daniel",
+          "CEO_Last_name": "Nadler",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/daniel-nadler-12345678",
+          "Description": "OpenEvidence is an AI-driven medical information platform that provides synthesized, evidence-based content to healthcare professionals for improved clinical decision-making.",
+          "City": "Miami",
+          "Country": "United States",
+          "Last_funding_type": "Series D",
+          "Last_funding_date": "2026-01-21",
+          "Hook": "OpenEvidence's AI model achieved a 100% score on the USMLE in 2025, demonstrating its advanced capabilities in medical knowledge synthesis.",
+          "Founder_detail": "Daniel Nadler, a Harvard Ph.D. and former founder of Kensho, launched OpenEvidence to address the challenge physicians face in keeping up with the growing volume of medical literature.",
+          "LinkedIn_message": "Daniel, I see OpenEvidence is all about turning data into actionable insights. I built an AI SDR that found you, and I can create one tailored for your ideal customer profile. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": "openevidence.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 6,
+          "Organization_name": "Periodic Labs",
+          "CEO_First_name": "Ekin Dogus",
+          "CEO_Last_name": "Cubuk",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/ekindoguscubuk",
+          "Description": "Periodic Labs develops AI scientists and autonomous laboratories to accelerate scientific discovery in the physical sciences.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-30",
+          "Hook": "Periodic Labs raised a $300 million seed round in September 2025, one of the largest first institutional financings ever recorded for a private technology company.",
+          "Founder_detail": "Ekin Dogus Cubuk led the materials and chemistry team at Google Brain and DeepMind, contributing to the GNoME materials-discovery project.",
+          "LinkedIn_message": "Hi William, I noticed Periodic Labs is redefining lab insights. I built an AI SDR that found you and can create a similar system tailored to your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": "periodic.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 7,
+          "Organization_name": "Phia",
+          "CEO_First_name": "Phoebe",
+          "CEO_Last_name": "Gates",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/phoebegates",
+          "Description": "Phia is an AI-powered shopping agent that helps consumers compare prices, calculate resale value, summarize product details, and track price drops in real time.",
+          "City": "New York",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-12-08",
+          "Hook": "Phia's AI agent scans over 350 million products across nearly 10,000 retail brand partners, including contemporary, resale, and luxury categories.",
+          "Founder_detail": "Co-founder Phoebe Gates met co-founder Sophia Kianni at Stanford University, where they were randomly paired as roommates.",
+          "LinkedIn_message": "Phoebe, scaling outreach can feel like running a marathon with no finish line. I built an AI SDR that found you, and I can create one tailored for your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": "phia.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 8,
+          "Organization_name": "Zania",
+          "CEO_First_name": "Shruti",
+          "CEO_Last_name": "Gupta",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shrutigupta",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hi Shruti, I noticed Zania is focused on improving customer engagement in a crowded market. I built an AI SDR that found you, and I can create one tailored for your target audience too. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 9,
+          "Organization_name": "FriendliAI",
+          "CEO_First_name": "Byung-Gon",
+          "CEO_Last_name": "Chun",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/byung-gon-chun",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hi Byung-Gon, I noticed how FriendliAI focuses on personalized user engagement. I've built an AI SDR that found you and I can create one tailored for your ideal customer profile. Up for a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 10,
+          "Organization_name": "Exa",
+          "CEO_First_name": "Will",
+          "CEO_Last_name": "Bryk",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/will-bryk-123456789",
+          "Description": "Exa is a developer-focused search infrastructure company providing AI-native semantic search APIs optimized for large language models and AI agents.",
+          "City": "San Francisco",
+          "Country": "USA",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2025-06-01",
+          "Hook": "Exa's semantic search technology is specifically designed to enhance AI agents' ability to retrieve relevant information, reducing hallucinations and improving the quality of retrieval-augmented generation systems.",
+          "Founder_detail": "Co-founder Jeff Wang ran a GPU cluster in his dorm room while studying Computer Science and Philosophy at Harvard University.",
+          "LinkedIn_message": "I noticed Exa is pushing boundaries in the tech space. I built an AI SDR that found you, and I can create a similar one tailored to your ideal customer profile. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": "exa.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 11,
+          "Organization_name": "HappyRobot",
+          "CEO_First_name": "Pablo",
+          "CEO_Last_name": "Palafox",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/pablopalafox",
+          "Description": "HappyRobot develops AI-native operating systems that automate complex operational tasks for enterprises, focusing on logistics and supply chain industries.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2025-09-03",
+          "Hook": "HappyRobot's platform integrates multiple AI models with deep enterprise system integrations to automate high-volume tasks, enabling human employees to focus on strategic work.",
+          "Founder_detail": "Pablo Palafox co-founded HappyRobot after meeting his co-founder Luis during their undergraduate studies in Robotics and Electronics, later pursuing a Master's in Mechanical Engineering at the Technical University of Munich.",
+          "LinkedIn_message": "Pablo, I noticed HappyRobot is all about leveraging tech to enhance creativity. I built an AI SDR that found you and I can create a similar system tailored to your ideal customer profile. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": "happyrobot.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 12,
+          "Organization_name": "Luma AI",
+          "CEO_First_name": "Amit",
+          "CEO_Last_name": "Jain",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/amit-jain",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Amit, did you know Luma AI can transform how businesses leverage visual content? I built an AI SDR that found you, and I can create a tailored version for your ideal customers. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 13,
+          "Organization_name": "Dyna Robotics",
+          "CEO_First_name": "Lindon",
+          "CEO_Last_name": "Gao",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/lindon-gao",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Dyna Robotics is pushing boundaries. I built an AI SDR that found you and can create one tailored for your ideal customer profile. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 14,
+          "Organization_name": "Burnt",
+          "CEO_First_name": "Joseph",
+          "CEO_Last_name": "Jacob",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/joseph-jacob",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hi Joseph, I noticed Burnt’s approach to tackling challenges in your space. I built an AI SDR that flagged your company for its innovative strategies. I can create a custom system tailored for your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 15,
+          "Organization_name": "PlayAI",
+          "CEO_First_name": "Hammad",
+          "CEO_Last_name": "Syed",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/hammad-syed",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hammad, PlayAI seems focused on transforming AI engagement. I built an AI SDR that identified you, and I can create a similar system tailored for your ideal customers. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 16,
+          "Organization_name": "Eve",
+          "CEO_First_name": "Jay",
+          "CEO_Last_name": "Madheswaran",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jayanthm",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hey Jay, I noticed Eve's innovative take on user engagement. I built an AI SDR that helped me find you, and I can create a custom one tailored for your ideal customer profile. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 17,
+          "Organization_name": "Maisa",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Villalón",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/david-villalon",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "David, noticed Maisa's push for innovation in AI. I built an AI SDR that found you and I can create a similar system tailored for your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": true,
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 18,
+          "Organization_name": "Anything",
+          "CEO_First_name": "Dhruv",
+          "CEO_Last_name": "Amin",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/dhruvamin",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hi Dhruv, I noticed your work at Anything and how you're tackling unique challenges. I built an AI SDR that found you, and I can create one tailored for your ICP too. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 19,
+          "Organization_name": "Trustible",
+          "CEO_First_name": "Gerald",
+          "CEO_Last_name": "Kierce-Iturrioz",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/gerald-kierce-iturrioz",
+          "Description": "Trustible is an AI governance platform that enables enterprises to manage AI risk, comply with evolving laws and standards, and integrate trust into their AI strategy.",
+          "City": "Arlington",
+          "Country": "United States",
+          "Last_funding_type": "Series Seed",
+          "Last_funding_date": "2025-06-10",
+          "Hook": "Trustible's platform embeds expert-level governance intelligence directly into AI review and approval processes, allowing teams to scale AI with confidence and trust.",
+          "Founder_detail": "Gerald Kierce-Iturrioz, originally from Puerto Rico, holds degrees in Entrepreneurship and Political Science from the University of Dayton.",
+          "LinkedIn_message": "Gerald, scaling outreach can feel like a maze. I built an AI SDR that found you, and I can create one tailored for your ideal customer profile. Interested in a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": "trustible.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 20,
+          "Organization_name": "Spara",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Walker",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/david-walker",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "David, I noticed Spara is tackling some ambitious goals in your sector. I built an AI SDR that identified you, and I can create a custom one tailored for your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 21,
+          "Organization_name": "Recall.ai",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Gu",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/davidgu",
+          "Description": "Recall.ai provides an API to access meeting data from platforms like Zoom, Google Meet, Microsoft Teams, and in-person meetings.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2025-09-04",
+          "Hook": "Recall.ai's infrastructure processes over three terabytes per second of raw video through custom pipelines and launches over 8 million EC2 instances monthly.",
+          "Founder_detail": "David Gu co-founded Recall.ai and serves as its CEO.",
+          "LinkedIn_message": "Hey David, ever think about how many connections slip through the cracks in outreach? I built an AI SDR that found you and I can create one tailored for your ICP at Recall.ai. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": "recall.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 22,
+          "Organization_name": "Terra Security",
+          "CEO_First_name": "Shahar",
+          "CEO_Last_name": "Peled",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shahar-peled",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hey Shahar, finding quality leads in the security space can be tough. I built a custom AI SDR that identified your profile, and I can create a similar system tailored for your ICP at Terra Security. Are you open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 23,
+          "Organization_name": "Harmonic",
+          "CEO_First_name": "Nimrod",
+          "CEO_Last_name": "Ben-Natan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/nimrod-ben-natan-868307",
+          "Description": "Harmonic is a technology company specializing in broadband and video streaming solutions.",
+          "City": "San Jose",
+          "Country": "United States",
+          "Last_funding_type": "Series C",
+          "Last_funding_date": "2025-11-25",
+          "Hook": "Harmonic's flagship AI model, Aristotle, achieved gold-medal level performance at the International Mathematical Olympiad.",
+          "Founder_detail": "Nimrod Ben-Natan joined Harmonic in 1996 as a software engineer and has been with the company for over two decades.",
+          "LinkedIn_message": "Tudor, I see Harmonic is making waves in the industry. I built an AI SDR that found you and can create a similar system tailored for your ideal customer profile. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": "harmonicinc.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 24,
+          "Organization_name": "Chai Discovery",
+          "CEO_First_name": "Joshua",
+          "CEO_Last_name": "Meier",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/joshua-meier",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Hey Joshua, I noticed Chai Discovery is tackling some interesting challenges in the research space. I built an AI SDR that found you, and I can create a custom version for your ideal customers. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 25,
+          "Organization_name": "LMArena",
+          "CEO_First_name": "Anastasios",
+          "CEO_Last_name": "Angelopoulos",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/anastasiosangelopoulos",
+          "Description": "LMArena is an open platform for crowdsourced AI model evaluation, enabling users to compare and benchmark AI models through real-world feedback.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2026-01-06",
+          "Hook": "LMArena's platform has attracted over 5 million monthly users across 150 countries, generating more than 60 million conversations monthly, making it a leading resource for AI model evaluations.",
+          "Founder_detail": "Anastasios Angelopoulos, CEO of LMArena, co-authored the 'Search Arena' paper, analyzing search-augmented language models, showcasing his expertise in AI research.",
+          "LinkedIn_message": "Hi Anastasios. I noticed LMArena is making waves in the industry. I built an AI SDR that found your profile and can create a similar system tailored for your ICP. Interested in a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": "lmarena.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 26,
+          "Organization_name": "Bria",
+          "CEO_First_name": "Yair",
+          "CEO_Last_name": "Adato",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/yairadato",
+          "Description": "Bria is a visual generative AI company offering a platform for businesses to create and edit images and videos using licensed data.",
+          "City": "Tel Aviv",
+          "Country": "Israel",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2025-03-13",
+          "Hook": "Bria's platform ensures businesses can create on-brand content with full IP licensing transparency.",
+          "Founder_detail": "Yair Adato holds a PhD in Computer Science in the field of computer vision from Ben-Gurion University with collaboration with Harvard University.",
+          "LinkedIn_message": "Not many CEOs know how to leverage AI for real growth. I built an AI SDR that found you and can tailor one for your ICP. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": "bria.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 27,
+          "Organization_name": "Hue",
+          "CEO_First_name": "Janvi",
+          "CEO_Last_name": "Shah",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/janvi-shah",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "Janvi, running a company focused on color trends is no small feat. I built an AI SDR that found you and I can create a custom one tailored for your target audience too. Open to a quick chat?",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 28,
+          "Organization_name": "MagicDoor",
+          "CEO_First_name": "Kasper",
+          "CEO_Last_name": "Søgaard",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/kaspersogaard",
+          "Description": "MagicDoor is an AI-native platform that automates property management tasks for landlords and property managers.",
+          "City": "Las Vegas",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-04",
+          "Hook": "MagicDoor's platform automates routine property management tasks, including rent collection, tenant communication, and maintenance requests.",
+          "Founder_detail": "Kasper Søgaard co-founded MagicDoor in 2023 and previously worked at Amazon.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "magicdoor.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 29,
+          "Organization_name": "Augment",
+          "CEO_First_name": "Andrew",
+          "CEO_Last_name": "Fritts",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/andrewfritts",
+          "Description": "Augment connects enterprise data, processes, and customer interactions into a single AI execution layer, transforming information into action and delivering expert outputs directly in the flow of work.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-09-04",
+          "Hook": "Augment's AI assistant, Augie, automates complex operational workflows for freight shippers, carriers, and brokers.",
+          "Founder_detail": "Andrew Fritts is the CEO of Augment, leading the company's mission to integrate AI into enterprise operations.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "augment.co"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 30,
+          "Organization_name": "Prorata.AI",
+          "CEO_First_name": "Bill",
+          "CEO_Last_name": "Gross",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/billgross",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 31,
+          "Organization_name": "Supio",
+          "CEO_First_name": "Jerry",
+          "CEO_Last_name": "Zhou",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jerry-zhou",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 32,
+          "Organization_name": "Summation",
+          "CEO_First_name": "Ian",
+          "CEO_Last_name": "Wong",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/ian-wong",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 33,
+          "Organization_name": "Scalekit",
+          "CEO_First_name": "Satya",
+          "CEO_Last_name": "Devarakonda",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/satya-devarakonda-12345678",
+          "Description": "Scalekit provides an authentication stack for AI applications, offering modular components for secure agent identity and tool-calling.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-16",
+          "Hook": "Scalekit raised $5.5 million in a seed funding round led by Together Fund and Z47 in September 2025.",
+          "Founder_detail": "Satya Devarakonda previously built Freshworks' in-house authentication platform, now serving over 50,000 businesses and 2 million users.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "scalekit.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 34,
+          "Organization_name": "Cluely",
+          "CEO_First_name": "Chungin",
+          "CEO_Last_name": "Lee",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/chungin-lee-12345678/",
+          "Description": "Cluely is an AI assistant company that provides real-time assistance during virtual meetings and interviews.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-06-20",
+          "Hook": "Cluely's initial 'cheat on everything' marketing campaign generated significant controversy and media attention.",
+          "Founder_detail": "Chungin Lee, the CEO, was suspended from Columbia University for creating a tool to cheat on technical interviews, which led to the founding of Cluely.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "cluely.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 35,
+          "Organization_name": "Plenful",
+          "CEO_First_name": "Joy",
+          "CEO_Last_name": "Liu",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/joy-liu",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 36,
+          "Organization_name": "Hyperbound",
+          "CEO_First_name": "Sriharsha",
+          "CEO_Last_name": "Guduguntla",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/sriharsha-guduguntla-12345678",
+          "Description": "Hyperbound is an AI-powered sales coaching and role-play platform designed to enhance sales team performance.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-09-15",
+          "Hook": "Hyperbound's platform supports over 25 languages, enabling global sales teams to practice and improve their skills.",
+          "Founder_detail": "Sriharsha Guduguntla co-founded Hyperbound in 2023, aiming to revolutionize sales training through AI-driven solutions.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "hyperbound.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 37,
+          "Organization_name": "Firecrawl",
+          "CEO_First_name": "Caleb",
+          "CEO_Last_name": "Peffer",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/caleb-peffer",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 38,
+          "Organization_name": "uiAgent",
+          "CEO_First_name": "Enes",
+          "CEO_Last_name": "Witwit",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/enes-witwit",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 39,
+          "Organization_name": "Optain",
+          "CEO_First_name": "Jeff",
+          "CEO_Last_name": "Dunkel",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jeffdunkel",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 40,
+          "Organization_name": "Friend",
+          "CEO_First_name": "Avi",
+          "CEO_Last_name": "Schiffmann",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/avi-schiffmann",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 41,
+          "Organization_name": "Trio",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Henderson",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/david-henderson-12345678",
+          "Description": "Trio is building Bitcoin-native infrastructure and tooling to provide secure, scalable, and high-utility DeFi solutions.",
+          "City": "Bitcoin",
+          "Country": "US",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2023-01-01",
+          "Hook": "Trio was the first Bitcoin inscription service, now expanding into a marketplace and launching its own utility token ($TRIO).",
+          "Founder_detail": "David Henderson is one of the original founders of Trio, which launched in 2023 as OrdinalsBot.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "trio.xyz"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 42,
+          "Organization_name": "Skild AI",
+          "CEO_First_name": "Deepak",
+          "CEO_Last_name": "Pathak",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/deepakpathak",
+          "Description": "Skild AI develops a unified AI model, the Skild Brain, designed to control various robots across different tasks and environments.",
+          "City": "Pittsburgh",
+          "Country": "United States",
+          "Last_funding_type": "Series C",
+          "Last_funding_date": "2026-01-14",
+          "Hook": "Skild AI's Skild Brain is trained with 1,000 times more data than its competitors, enabling it to control robots of various shapes and sizes.",
+          "Founder_detail": "Deepak Pathak earned a PhD in AI at the University of California, Berkeley, and co-founded VisageMap, a facial recognition startup acquired by FaceFirst.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "skild.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 43,
+          "Organization_name": "Penguin Ai",
+          "CEO_First_name": "Fawad",
+          "CEO_Last_name": "Butt",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/fawad-butt",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 44,
+          "Organization_name": "Read AI",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Shim",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/david-shim",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 45,
+          "Organization_name": "Casca",
+          "CEO_First_name": "Lukas",
+          "CEO_Last_name": "Haffer",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/lukas-haffer-123456789",
+          "Description": "Casca is an AI-native loan origination platform that automates business loan applications for financial institutions, reducing manual effort and increasing conversion rates.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-08-19",
+          "Hook": "Casca's platform can fund commercial loans up to 10 times faster than other FinTechs and 30 times faster than industry averages.",
+          "Founder_detail": "Lukas Haffer previously served as Chief of Staff for the European Market at Avaloq, overseeing platforms managing $4 trillion in assets.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "cascading.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 46,
+          "Organization_name": "OpenRouter",
+          "CEO_First_name": "Alex",
+          "CEO_Last_name": "Atallah",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/alexatallah",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 47,
+          "Organization_name": "Cassidy",
+          "CEO_First_name": "Justin",
+          "CEO_Last_name": "Fineberg",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/justinfineberg/",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 48,
+          "Organization_name": "Venteur",
+          "CEO_First_name": "Stacy",
+          "CEO_Last_name": "Edgar",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/stacyedgar",
+          "Description": "Venteur is a health technology company that provides an AI-powered platform for Individual Coverage Health Reimbursement Arrangements (ICHRA), enabling employers to offer personalized health benefits to their employees.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-04-01",
+          "Hook": "Venteur's platform has served 30,000 employees at 600 businesses, offering personalized health benefits through ICHRA solutions.",
+          "Founder_detail": "Stacy Edgar has over 15 years of experience in the international development sector, including roles with USAID, the Department of State, and the Foreign, Commonwealth & Development Office.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "venteur.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 49,
+          "Organization_name": "Revalia Bio",
+          "CEO_First_name": "Greg",
+          "CEO_Last_name": "Tietjen",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/greg-tietjen-123456789",
+          "Description": "Revalia Bio is a biotechnology company that transforms donated human organs and tissues into high-fidelity biological data using AI, aiming to accelerate biomedical innovation.",
+          "City": "New Haven",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-01",
+          "Hook": "Revalia Bio has developed a proprietary organ perfusion technology that revives donated organs for up to five days, enabling advanced human data trials.",
+          "Founder_detail": "Greg Tietjen founded Revalia Bio to honor the legacy of his family members by transforming how biomedical innovation is conducted.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "revaliabio.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 50,
+          "Organization_name": "Nous Research",
+          "CEO_First_name": "Jeffrey",
+          "CEO_Last_name": "Quesnelle",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jeffreyquesnelle",
+          "Description": "Nous Research is an open-source AI research lab specializing in developing advanced language models and decentralized training infrastructure.",
+          "City": "Austin",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-04-25",
+          "Hook": "Nous Research's Hermes series of language models have been downloaded over 50 million times on Hugging Face, reflecting their significant impact in the AI research community.",
+          "Founder_detail": "CEO Jeffrey Quesnelle is a practicing Catholic who seeks to use faith as a guide around AI ethical questions.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "nousresearch.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 51,
+          "Organization_name": "Composio",
+          "CEO_First_name": "Soham",
+          "CEO_Last_name": "Ganatra",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/soham-ganatra",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 52,
+          "Organization_name": "Hyphen",
+          "CEO_First_name": "Stephen",
+          "CEO_Last_name": "Klein",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/stephen-klein",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 53,
+          "Organization_name": "Hello Patient",
+          "CEO_First_name": "Alex",
+          "CEO_Last_name": "Cohen",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/alex-cohen",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 54,
+          "Organization_name": "Munify",
+          "CEO_First_name": "Khalid",
+          "CEO_Last_name": "Ashmawy",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/khalidashmawy",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 55,
+          "Organization_name": "Yoodli",
+          "CEO_First_name": "Varun",
+          "CEO_Last_name": "Puri",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/varun-puri",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 56,
+          "Organization_name": "SRE.ai",
+          "CEO_First_name": "Rajsekhar",
+          "CEO_Last_name": "Kadiyala",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/rajkadiyala",
+          "Description": "SRE.ai is an AI-native DevOps platform that automates complex enterprise workflows for applications like Salesforce, ServiceNow, and Oracle.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-20",
+          "Hook": "SRE.ai's platform integrates seamlessly with tools like GitHub and Slack, reducing deployment times from hours to minutes.",
+          "Founder_detail": "Rajsekhar Kadiyala co-founded SRE.ai after his tenure at Google Research and DeepMind, aiming to modernize DevOps tooling for enterprise applications.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "sre.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 57,
+          "Organization_name": "Decart",
+          "CEO_First_name": "Dean",
+          "CEO_Last_name": "Leitersdorf",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/dean-leitersdorf",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 58,
+          "Organization_name": "Reka AI",
+          "CEO_First_name": "Dani",
+          "CEO_Last_name": "Yogatama",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/dani-yogatama-123456789",
+          "Description": "Reka AI is an AI research and product company that develops multimodal models capable of understanding the world, reasoning, and taking actions.",
+          "City": "Sunnyvale",
+          "Country": "United States",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2025-07-24",
+          "Hook": "Reka AI's Reka Core model matches or exceeds the performance of top models from leading AI companies, including OpenAI and Google.",
+          "Founder_detail": "Dani Yogatama, the CEO of Reka AI, previously worked at Google DeepMind.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "reka.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 59,
+          "Organization_name": "Circuit & Chisel",
+          "CEO_First_name": "Louis",
+          "CEO_Last_name": "Amira",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/louisamira",
+          "Description": "Circuit & Chisel is an agentic AI payments startup building the infrastructure to power transactions between intelligent agents.",
+          "City": "New York",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-22",
+          "Hook": "Circuit & Chisel's ATXP protocol enables AI agents to autonomously handle the commerce lifecycle from discovery to payment without human oversight.",
+          "Founder_detail": "Louis Amira, CEO of Circuit & Chisel, was previously the Head of Crypto & AI Partnerships at Stripe.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "circuitandchisel.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 60,
+          "Organization_name": "Parallel",
+          "CEO_First_name": "Parag",
+          "CEO_Last_name": "Agrawal",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/parag-agrawal",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 61,
+          "Organization_name": "Conceivable Life Sciences",
+          "CEO_First_name": "Alan",
+          "CEO_Last_name": "Murray",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/alanmurray",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 62,
+          "Organization_name": "Zocks",
+          "CEO_First_name": "Mark",
+          "CEO_Last_name": "Gilbert",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/mark-gilbert",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 63,
+          "Organization_name": "Ankored",
+          "CEO_First_name": "Seth",
+          "CEO_Last_name": "Lieberman",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/sethlieberman",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 64,
+          "Organization_name": "Sola",
+          "CEO_First_name": "Jessica",
+          "CEO_Last_name": "Wu",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jessicawu",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 65,
+          "Organization_name": "Centari",
+          "CEO_First_name": "Kevin",
+          "CEO_Last_name": "Walker",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/kevin-walker",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 66,
+          "Organization_name": "DianaHR",
+          "CEO_First_name": "Upeka",
+          "CEO_Last_name": "Bee",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/upeka-bee-123456789",
+          "Description": "DianaHR offers AI-powered HR-as-a-Service solutions for small and medium-sized businesses, automating routine HR tasks to save time and reduce costs.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-14",
+          "Hook": "DianaHR's platform automates most HR activities, saving owners over 15 hours a week and cutting costs by 60 percent.",
+          "Founder_detail": "Upeka Bee, the founder and CEO, was previously the Head of Engineering at Gusto HR, where she built the feature set that established Gusto as a leading HR provider.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "getdianahr.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 67,
+          "Organization_name": "Vibranium Labs",
+          "CEO_First_name": "Sang",
+          "CEO_Last_name": "Lee",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/sang-lee",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 68,
+          "Organization_name": "Aurasell",
+          "CEO_First_name": "Jason",
+          "CEO_Last_name": "Eubanks",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jason-eubanks",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 69,
+          "Organization_name": "Listen Labs",
+          "CEO_First_name": "Alfred",
+          "CEO_Last_name": "Wahlforss",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/alfredwahlforss",
+          "Description": "Listen Labs is an AI-first customer research platform that automates and scales qualitative customer interviews using AI interviewers.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2026-01-14",
+          "Hook": "Listen Labs has conducted over 1 million interviews and serves clients like Microsoft, Perplexity, and Sweetgreen.",
+          "Founder_detail": "Alfred Wahlforss, the CEO, co-founded Listen Labs in 2023 and has a background in computer science from Harvard University.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "listenlabs.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 70,
+          "Organization_name": "Salt AI",
+          "CEO_First_name": "Aber",
+          "CEO_Last_name": "Whitcomb",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/aberwhitcomb",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 71,
+          "Organization_name": "Trially",
+          "CEO_First_name": "Kyle",
+          "CEO_Last_name": "McAllister",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/kyle-mcallister",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 72,
+          "Organization_name": "Agora",
+          "CEO_First_name": "Nick",
+          "CEO_Last_name": "van Eck",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/nickvaneck",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 73,
+          "Organization_name": "QuickCode ai",
+          "CEO_First_name": "Shannon",
+          "CEO_Last_name": "Hynds",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shannon-hynds-123456789",
+          "Description": "QuickCode ai provides AI-driven trade compliance software to help organizations manage complex global trade regulations.",
+          "City": "McLean",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2021-01-01",
+          "Hook": "QuickCode ai's AI-driven platform reduces compliance risk by 30% and saves 80% of the time spent on manual analysis.",
+          "Founder_detail": "Shannon Hynds, the founder and CEO, has a background in data science and artificial intelligence, with experience in developing machine learning models for research at Harvard University.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "quickcode.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 74,
+          "Organization_name": "TollBit",
+          "CEO_First_name": "Toshit",
+          "CEO_Last_name": "Panigrahi",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/toshitpanigrahi",
+          "Description": "TollBit provides a platform that enables publishers to monitor, manage, and monetize AI bot traffic accessing their content.",
+          "City": "New York",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2024-10-22",
+          "Hook": "TollBit has raised $31 million from leading investors in publishing, AI, and tech, including Lightspeed Venture Partners and S32.",
+          "Founder_detail": "Co-founder and CEO Toshit Panigrahi previously founded Toast and Statsify.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "tollbit.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 75,
+          "Organization_name": "TinyFish",
+          "CEO_First_name": "Sudheesh",
+          "CEO_Last_name": "Nair",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/sudheesh-nair",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 76,
+          "Organization_name": "Lyzr",
+          "CEO_First_name": "Siva",
+          "CEO_Last_name": "Surendira",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/siva-surendira-9881ed18",
+          "Description": "Lyzr provides an enterprise-grade platform for building, deploying, and governing autonomous AI agents across various business functions.",
+          "City": "Jersey City",
+          "Country": "United States",
+          "Last_funding_type": "Series A+",
+          "Last_funding_date": "2026-03-11",
+          "Hook": "Lyzr's platform has been deployed in over one million agents in production, demonstrating its scalability and reliability.",
+          "Founder_detail": "Siva Surendira previously founded PowerUpCloud, an AWS consulting firm acquired by L&T Group in 2019.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "lyzr.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 77,
+          "Organization_name": "Fluence",
+          "CEO_First_name": "Luciana",
+          "CEO_Last_name": "Frazão",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/luciana-frazao",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 78,
+          "Organization_name": "BizzTech",
+          "CEO_First_name": "Dirk",
+          "CEO_Last_name": "Schmidt",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/dirk-schmidt",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 79,
+          "Organization_name": "LightSpun",
+          "CEO_First_name": "Shaju",
+          "CEO_Last_name": "Puthussery",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shajuputhussery",
+          "Description": "LightSpun is an AI-powered dental insurance administration platform that automates claims processing, credentialing, and benefits management to enhance operational efficiency.",
+          "City": "Boston",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-09-04",
+          "Hook": "LightSpun's AI platform reduces provider onboarding time from 45–60 days to under a week.",
+          "Founder_detail": "CEO and co-founder Shaju Puthussery has experience at Overjet, DentaQuest, Fluent, and Optikos.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "lightspun.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 80,
+          "Organization_name": "Jump",
+          "CEO_First_name": "Parker",
+          "CEO_Last_name": "Ence",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/parkerence",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 81,
+          "Organization_name": "Edera",
+          "CEO_First_name": "Emily",
+          "CEO_Last_name": "Long",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/emily-long-7a194b4",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 82,
+          "Organization_name": "FurtherAI",
+          "CEO_First_name": "Aman",
+          "CEO_Last_name": "Gour",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/aman-gour",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 83,
+          "Organization_name": "Pathway",
+          "CEO_First_name": "Jonathan",
+          "CEO_Last_name": "Hershon St-Jean",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jonathan-hershon-st-jean-123456789",
+          "Description": "Pathway develops AI architectures and models that autonomously and continually learn, evolve, and reason.",
+          "City": "Palo Alto",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2024-10-08",
+          "Hook": "Pathway's AI model recently scored a record 96% on the U.S. Medical Licensing Examination (USMLE) benchmark.",
+          "Founder_detail": "Jonathan Hershon St-Jean previously worked at FounderFuel and Syme.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "pathway.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 84,
+          "Organization_name": "Nowadays",
+          "CEO_First_name": "Anna",
+          "CEO_Last_name": "Sun",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/anna-sun",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 85,
+          "Organization_name": "Basis",
+          "CEO_First_name": "Matthew",
+          "CEO_Last_name": "Harpe",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/matt-harpe",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 86,
+          "Organization_name": "Topline Pro",
+          "CEO_First_name": "Nick",
+          "CEO_Last_name": "Ornitz",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/nickornitz",
+          "Description": "Topline Pro is a Generative AI platform enabling home service businesses to be easily discovered, trusted, and booked directly.",
+          "City": "New York",
+          "Country": "United States",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2025-08-14",
+          "Hook": "Topline Pro's AI-driven platform enables home service businesses to create a custom, SEO-optimized website in a single day, significantly accelerating the process compared to traditional marketing agencies.",
+          "Founder_detail": "Co-founder Nick Ornitz holds a chemical engineering degree from Cornell University and completed one year at Harvard Business School.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "toplinepro.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 87,
+          "Organization_name": "Tie",
+          "CEO_First_name": "Michael",
+          "CEO_Last_name": "Diesu",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/michael-diesu-12345678",
+          "Description": "Tie is a provider of AI-powered identity solutions for e-commerce brands, enabling them to convert anonymous website visitors into high-value customers.",
+          "City": "Miami",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-09-30",
+          "Hook": "Tie's platform has helped hundreds of fast-growing B2C brands, including Caraway and Macy’s Wine Shop, significantly grow their email lists and customer base.",
+          "Founder_detail": "Michael Diesu, the CEO and founder of Tie, previously worked at Accenture before starting the company.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "thetie.io"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 88,
+          "Organization_name": "Ultralytics",
+          "CEO_First_name": "Glenn",
+          "CEO_Last_name": "Jocher",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/glennjocher",
+          "Description": "Ultralytics is a leading AI company dedicated to creating transformative, open-source computer vision solutions, best known as the creators of the YOLO real-time object detection framework.",
+          "City": "London",
+          "Country": "United Kingdom",
+          "Last_funding_type": "Series B",
+          "Last_funding_date": "2025-10-06",
+          "Hook": "Ultralytics' YOLO models have driven the framework to over 125,000 GitHub stars and billions of daily model inferences across industries such as robotics, healthcare, and manufacturing.",
+          "Founder_detail": "Glenn Jocher founded Ultralytics in 2014, aiming to make AI open, accessible, and powerful enough to change the world.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "ultralytics.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 89,
+          "Organization_name": "Barti",
+          "CEO_First_name": "Colton",
+          "CEO_Last_name": "Calandrella",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/colton-calandrella-123456789",
+          "Description": "Barti develops AI-powered electronic health record (EHR) and practice management software tailored for eye care professionals.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-09-25",
+          "Hook": "Barti is the first EHR in optometry to deploy AI Scribe, enhancing efficiency for eye care providers.",
+          "Founder_detail": "Colton Calandrella has a background in management consulting with Bain & Company and has been recognized with the Emerging Leader Award by WashU Olin Business School in 2026.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "barti.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 90,
+          "Organization_name": "7AI",
+          "CEO_First_name": "Lior",
+          "CEO_Last_name": "Div",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/liordiv",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 91,
+          "Organization_name": "Biobot Analytics",
+          "CEO_First_name": "Mariana",
+          "CEO_Last_name": "Matus",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/mariana-matus-0b8b1b1b/",
+          "Description": "Biobot Analytics is a biotechnology company specializing in wastewater-based epidemiology, analyzing sewage to provide early warnings of public health threats.",
+          "City": "Cambridge",
+          "Country": "United States",
+          "Last_funding_type": "Series C",
+          "Last_funding_date": "2025-06-18",
+          "Hook": "Biobot Analytics is the first company to commercialize data from sewage, offering real-time, privacy-first health intelligence.",
+          "Founder_detail": "Dr. Mariana Matus, a computational biologist, initiated wastewater epidemiology research as a PhD student at MIT to apply technical skills to public health.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "biobot.io"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 92,
+          "Organization_name": "Physical Intelligence",
+          "CEO_First_name": "Karol",
+          "CEO_Last_name": "Hausman",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/karol-hausman-12345678",
+          "Description": "Physical Intelligence develops foundation models and learning algorithms to enable robots to perform complex tasks in the physical world.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2024-11-04",
+          "Hook": "Physical Intelligence secured a $400 million Series A funding round led by Bond Capital, Thrive Capital, and Lux Capital in November 2024.",
+          "Founder_detail": "Karol Hausman, CEO and co-founder, was previously a Staff Research Scientist at Google DeepMind and an Adjunct Professor at Stanford, where he co-taught a class on Deep Reinforcement Learning.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "pi.website"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 93,
+          "Organization_name": "Nuclearn",
+          "CEO_First_name": "Bradley",
+          "CEO_Last_name": "Fox",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/bradleyfox",
+          "Description": "Nuclearn provides AI solutions to automate critical processes in the nuclear power industry, enhancing safety and efficiency.",
+          "City": "Phoenix",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-09-09",
+          "Hook": "Nuclearn's AI tools are deployed in over 65 nuclear reactors worldwide, demonstrating significant industry adoption.",
+          "Founder_detail": "Bradley Fox was recognized by the Nuclear Energy Institute as one of its '40 Under 40' leaders in 2024.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "nuclearn.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 94,
+          "Organization_name": "Sotira",
+          "CEO_First_name": "Amrita",
+          "CEO_Last_name": "Bhasin",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/amritabhasin",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 95,
+          "Organization_name": "Fleak",
+          "CEO_First_name": "Yichen",
+          "CEO_Last_name": "Jin",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/yichenjin",
+          "Description": "Fleak is an AI-powered platform that simplifies complex data workflows, enabling data teams to build and deploy real-time AI applications with reduced engineering effort and infrastructure management.",
+          "City": "San Jose",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-11-01",
+          "Hook": "Fleak's platform reduces engineering effort by up to 90% and eliminates maintenance overhead, enabling businesses to accelerate innovation and unlock new opportunities within days.",
+          "Founder_detail": "Yichen Jin co-founded Fleak after creating the Netflix DataMesh from scratch, revolutionizing data infrastructure.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "fleak.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 96,
+          "Organization_name": "Zingage",
+          "CEO_First_name": "Victor",
+          "CEO_Last_name": "Hunt",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/victor-hunt-12345678",
+          "Description": "Zingage is an AI care delivery platform for home-based healthcare, automating scheduling, staffing, and compliance to ensure reliable in-home patient care.",
+          "City": "New York",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-10-07",
+          "Hook": "Zingage's AI platform is trusted by over 500 leading home care agencies, automating critical workflows to enhance operational efficiency.",
+          "Founder_detail": "Victor Hunt, CEO of Zingage, previously founded Astorian, a marketplace for contractors, before focusing on AI solutions for home care.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "zingage.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 97,
+          "Organization_name": "Worth AI",
+          "CEO_First_name": "Suneera",
+          "CEO_Last_name": "Madhani",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/suneeramadhani",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 98,
+          "Organization_name": "Alguna",
+          "CEO_First_name": "Aleks",
+          "CEO_Last_name": "Đekić",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/aleksd",
+          "Description": "Alguna is a modern pricing, quoting, and billing platform for B2B SaaS companies.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-25",
+          "Hook": "Alguna raised $4 million in Seed funding in September 2025, led by Mango Capital and Atlantic Labs.",
+          "Founder_detail": "Aleks Đekić co-founded Alguna in 2023, focusing on automating pricing, quoting, and billing processes for B2B SaaS companies.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "alguna.io"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 99,
+          "Organization_name": "Greenlite",
+          "CEO_First_name": "Will",
+          "CEO_Last_name": "Lawrence",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/will-lawrence",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 100,
+          "Organization_name": "AegisAI",
+          "CEO_First_name": "Cy",
+          "CEO_Last_name": "Khormaee",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/cykho",
+          "Description": "AegisAI is an AI-native email security platform that uses autonomous AI agents to detect and eliminate email threats for enterprises.",
+          "City": "New York City",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-10",
+          "Hook": "AegisAI's AI-native email security platform integrates directly via API with Google Workspace and Microsoft 365, requiring no MX record changes or mail flow disruptions.",
+          "Founder_detail": "Cy Khormaee led the security team at Google responsible for protecting billions of users from phishing, malware, and fraud before founding AegisAI.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "aegisai.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 101,
+          "Organization_name": "Prophet Security",
+          "CEO_First_name": "Kamal",
+          "CEO_Last_name": "Shah",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/kamalshah",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 102,
+          "Organization_name": "Ryght AI",
+          "CEO_First_name": "Simon",
+          "CEO_Last_name": "Arkell",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/simonarkell/",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 103,
+          "Organization_name": "StackHawk",
+          "CEO_First_name": "Joni",
+          "CEO_Last_name": "Klippert",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/joniklippert",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 104,
+          "Organization_name": "CYVL",
+          "CEO_First_name": "Daniel",
+          "CEO_Last_name": "Pelaez",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/danielpelaez",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 105,
+          "Organization_name": "Graphite",
+          "CEO_First_name": "Merrill",
+          "CEO_Last_name": "Lutsky",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/merrill-lutsky",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 106,
+          "Organization_name": "Metal",
+          "CEO_First_name": "Taylor",
+          "CEO_Last_name": "Lowe",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/taylor-lowe",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 107,
+          "Organization_name": "Dedalus Labs",
+          "CEO_First_name": "Cathy",
+          "CEO_Last_name": "Di",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/cathy-di-12345678",
+          "Description": "Dedalus Labs provides a platform for developers to build, deploy, and manage AI agents.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-10-15",
+          "Hook": "Dedalus Labs raised $11 million in seed funding to redefine how developers build AI agents.",
+          "Founder_detail": "Cathy Di is the CEO and co-founder of Dedalus Labs.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "dedaluslabs.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 108,
+          "Organization_name": "Hipp Health",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Connors",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/david-connors",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 109,
+          "Organization_name": "Chaima.AI",
+          "CEO_First_name": "Jocelyn",
+          "CEO_Last_name": "Shieh",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jocelyn-shieh-12345678",
+          "Description": "Chaima.AI is a personal romance concierge service that plans and books luxury experiences for couples.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-06-20",
+          "Hook": "Chaima.AI offers personalized luxury experiences designed to rekindle connection and celebrate unique bonds.",
+          "Founder_detail": "Jocelyn Shieh is the CEO of Chaima.AI, leading the company in providing tailored romantic getaways for couples.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "chaima.app"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 110,
+          "Organization_name": "Elysian",
+          "CEO_First_name": "Grace",
+          "CEO_Last_name": "Hanson",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/grace-hanson",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 111,
+          "Organization_name": "Landbase",
+          "CEO_First_name": "Daniel",
+          "CEO_Last_name": "Saks",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/danielsaks",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 112,
+          "Organization_name": "Autonomize AI",
+          "CEO_First_name": "Ganesh",
+          "CEO_Last_name": "Padmanabhan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/ganeshpadmanabhan",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 113,
+          "Organization_name": "Kite AI",
+          "CEO_First_name": "Chi",
+          "CEO_Last_name": "Zhang",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/chi-zhang",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 114,
+          "Organization_name": "SquareX",
+          "CEO_First_name": "Vivek",
+          "CEO_Last_name": "Ramachandran",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/vivekramachandran",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 115,
+          "Organization_name": "PlayerZero",
+          "CEO_First_name": "Animesh",
+          "CEO_Last_name": "Koratana",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/animeshkoratana",
+          "Description": "PlayerZero is a predictive software quality company that helps enterprises ship flawless software faster by fixing, learning from, and preventing problems before they impact customers.",
+          "City": "Atlanta",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2025-07-30",
+          "Hook": "PlayerZero's AI-powered platform deeply understands how code works across entire systems, predicts failures before they happen, and continuously learns from every issue to strengthen software resilience.",
+          "Founder_detail": "Animesh Koratana founded PlayerZero in 2018 after working with early customers since late last year, officially launching the company in 2025.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "playerzero.ai"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 116,
+          "Organization_name": "Manas AI",
+          "CEO_First_name": "Siddhartha",
+          "CEO_Last_name": "Mukherjee",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/siddhartha-mukherjee",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 117,
+          "Organization_name": "Eloquent AI",
+          "CEO_First_name": "Tugce",
+          "CEO_Last_name": "Bulut",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/tugcebulut",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 118,
+          "Organization_name": "Arvist",
+          "CEO_First_name": "Nilay",
+          "CEO_Last_name": "Parikh",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/nilay-parikh",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 119,
+          "Organization_name": "EnCharge AI",
+          "CEO_First_name": "Naveen",
+          "CEO_Last_name": "Verma",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/naveen-verma",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 120,
+          "Organization_name": "Central",
+          "CEO_First_name": "Josh",
+          "CEO_Last_name": "Wymer",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/joshwymer",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 121,
+          "Organization_name": "Delve",
+          "CEO_First_name": "Patrick",
+          "CEO_Last_name": "Frend",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/patrickfrend",
+          "Description": "Delve is a multidisciplinary product innovation firm that helps companies bring bold ideas to market through advanced research, strategy, design, and engineering expertise.",
+          "City": "Madison",
+          "Country": "United States",
+          "Last_funding_type": "Series A",
+          "Last_funding_date": "2023-06-01",
+          "Hook": "Delve has been recognized with over 200 awards and holds more than 1,800 patents, showcasing its commitment to innovation.",
+          "Founder_detail": "Before launching Delve, co-founder Selin Kocalar conducted research at MIT and Stanford, published 8 papers by age 20, and sent an experiment to the International Space Station as a high schooler.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "delve.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 122,
+          "Organization_name": "Irrigreen",
+          "CEO_First_name": "Shane",
+          "CEO_Last_name": "Dyer",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shanedyer",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 123,
+          "Organization_name": "Accordance",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Yue",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/david-yue-123456789",
+          "Description": "Accordance is an AI-native platform designed to assist tax, audit, and CPA teams by automating complex financial workflows and providing authoritative insights.",
+          "City": "San Francisco",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2025-09-09",
+          "Hook": "Accordance's AI platform has been adopted by educational institutions such as the USF School of Law, demonstrating its integration into academic settings.",
+          "Founder_detail": "David Yue, CEO of Accordance, co-founded the company in 2024 after leading a $13 million funding round from prominent investors including Khosla Ventures and General Catalyst.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "accordance.com"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 124,
+          "Organization_name": "Wisdom AI",
+          "CEO_First_name": "Soham",
+          "CEO_Last_name": "Mazumdar",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/sohammazumdar",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 125,
+          "Organization_name": "Prompt Security",
+          "CEO_First_name": "Itamar",
+          "CEO_Last_name": "Golan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/itamar-golan-12345678",
+          "Description": "Prompt Security is an Israeli cybersecurity company that developed an enterprise platform designed to secure employee use of AI and protect in-house AI applications by providing real-time visibility, policy enforcement, and automated risk mitigation for GPT-style systems and other generative AI deployments.",
+          "City": "New York City",
+          "Country": "United States",
+          "Last_funding_type": "Seed",
+          "Last_funding_date": "2024-01-24",
+          "Hook": "Prompt Security was acquired by SentinelOne in August 2025 at a valuation between $250M and $300M.",
+          "Founder_detail": "Itamar Golan has spent the past 15 years at the intersection of AI and cybersecurity, having worked in organizations like the IDF, Check Point, and Orca Security.",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": "prompt.security"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 126,
+          "Organization_name": "Skylark Labs",
+          "CEO_First_name": "Amarjot",
+          "CEO_Last_name": "Singh",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 127,
+          "Organization_name": "Confido Health",
+          "CEO_First_name": "Chetan",
+          "CEO_Last_name": "Reddy",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/chetanreddy",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 128,
+          "Organization_name": "Sphinx",
+          "CEO_First_name": "Rohan",
+          "CEO_Last_name": "Kodialam",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 129,
+          "Organization_name": "Neurable",
+          "CEO_First_name": "Ramses",
+          "CEO_Last_name": "Alcaide",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 130,
+          "Organization_name": "Refiberd",
+          "CEO_First_name": "Sarika",
+          "CEO_Last_name": "Bajaj",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 131,
+          "Organization_name": "Eyebot",
+          "CEO_First_name": "Matthias",
+          "CEO_Last_name": "Hofmann",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 132,
+          "Organization_name": "Ekkobar",
+          "CEO_First_name": "Rhys",
+          "CEO_Last_name": "Ryan",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 133,
+          "Organization_name": "Slingshot AI",
+          "CEO_First_name": "Daniel Reid",
+          "CEO_Last_name": "Cahn",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 134,
+          "Organization_name": "Camp Network",
+          "CEO_First_name": "James",
+          "CEO_Last_name": "Chi",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/james-chi",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 135,
+          "Organization_name": "Landng",
+          "CEO_First_name": "Devon",
+          "CEO_Last_name": "DeAngelo",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 136,
+          "Organization_name": "Agtonomy",
+          "CEO_First_name": "Tim",
+          "CEO_Last_name": "Bucher",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/timbucher",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 137,
+          "Organization_name": "Keye",
+          "CEO_First_name": "Rohan",
+          "CEO_Last_name": "Parikh",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 138,
+          "Organization_name": "InOrbit",
+          "CEO_First_name": "Florian",
+          "CEO_Last_name": "Pestoni",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 139,
+          "Organization_name": "Cline",
+          "CEO_First_name": "Saoud",
+          "CEO_Last_name": "Rizwan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/saoud-rizwan",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 140,
+          "Organization_name": "David AI",
+          "CEO_First_name": "Tomer",
+          "CEO_Last_name": "Cohen",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/tomer-c/",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 141,
+          "Organization_name": "Tahoe Therapeutics",
+          "CEO_First_name": "Nima",
+          "CEO_Last_name": "Alidoust",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 142,
+          "Organization_name": "Doorstep AI",
+          "CEO_First_name": "Shashwat",
+          "CEO_Last_name": "Murarka",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shashwat-m",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 143,
+          "Organization_name": "Aeon",
+          "CEO_First_name": "Naweed",
+          "CEO_Last_name": "Tahmas",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 144,
+          "Organization_name": "Loti",
+          "CEO_First_name": "Luke",
+          "CEO_Last_name": "Arrigoni",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/lukearrigoni",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 145,
+          "Organization_name": "Campfire",
+          "CEO_First_name": "John",
+          "CEO_Last_name": "Glasgow",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/johnglasgow",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 146,
+          "Organization_name": "Biostate AI",
+          "CEO_First_name": "David",
+          "CEO_Last_name": "Zhang",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/david-zhang",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 147,
+          "Organization_name": "VIA",
+          "CEO_First_name": "Colin",
+          "CEO_Last_name": "Gounden",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 148,
+          "Organization_name": "Arintra",
+          "CEO_First_name": "Nitesh",
+          "CEO_Last_name": "Shroff",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 149,
+          "Organization_name": "Pickle Robot",
+          "CEO_First_name": "Andrew",
+          "CEO_Last_name": "Meyer",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/andrew-meyer",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 150,
+          "Organization_name": "Traversal",
+          "CEO_First_name": "Anish",
+          "CEO_Last_name": "Agarwal",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/anishagarwal",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 151,
+          "Organization_name": "VulnCheck",
+          "CEO_First_name": "Anthony",
+          "CEO_Last_name": "Bettini",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/anthonybettini",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 152,
+          "Organization_name": "Emergent",
+          "CEO_First_name": "Grig",
+          "CEO_Last_name": "Mindlin",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 153,
+          "Organization_name": "Anchor",
+          "CEO_First_name": "Rom",
+          "CEO_Last_name": "Lakritz",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/romlakritz",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 154,
+          "Organization_name": "PhaseV",
+          "CEO_First_name": "Raviv",
+          "CEO_Last_name": "Pryluk",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 155,
+          "Organization_name": "Recraft",
+          "CEO_First_name": "Anna Veronika",
+          "CEO_Last_name": "Dorogush",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 156,
+          "Organization_name": "CrewAI",
+          "CEO_First_name": "João",
+          "CEO_Last_name": "Moura",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 157,
+          "Organization_name": "Helios Artificial Intelligence",
+          "CEO_First_name": "Francisco",
+          "CEO_Last_name": "Martin-Rayo",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 158,
+          "Organization_name": "The Interaction Company of California",
+          "CEO_First_name": "Barry",
+          "CEO_Last_name": "Rosen",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/barry-rosen",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 159,
+          "Organization_name": "Reflection.Ai",
+          "CEO_First_name": "Misha",
+          "CEO_Last_name": "Laskin",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 160,
+          "Organization_name": "Careerspan",
+          "CEO_First_name": "Vrijen",
+          "CEO_Last_name": "Attawar",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/vrijenattawar",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 161,
+          "Organization_name": "Nauta",
+          "CEO_First_name": "Valentina",
+          "CEO_Last_name": "Jordan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/valentinajordan",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 162,
+          "Organization_name": "Rad Security",
+          "CEO_First_name": "Brooke",
+          "CEO_Last_name": "Motta",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 163,
+          "Organization_name": "DataJoint",
+          "CEO_First_name": "Jim",
+          "CEO_Last_name": "Olson",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jim-olson",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 164,
+          "Organization_name": "Outtake",
+          "CEO_First_name": "Alex",
+          "CEO_Last_name": "Dhillon",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 165,
+          "Organization_name": "Fundamental Research Labs",
+          "CEO_First_name": "Robert",
+          "CEO_Last_name": "Yang",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/robert-yang",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 166,
+          "Organization_name": "Superblocks",
+          "CEO_First_name": "Brad",
+          "CEO_Last_name": "Menezes",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/bradmenezes",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 167,
+          "Organization_name": "Alix",
+          "CEO_First_name": "Alexandra",
+          "CEO_Last_name": "Mysoor",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/alexandramysoor",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 168,
+          "Organization_name": "Alex AI",
+          "CEO_First_name": "Aaron",
+          "CEO_Last_name": "Wang",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/aaron-wang",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 169,
+          "Organization_name": "Arcade.dev",
+          "CEO_First_name": "Alex",
+          "CEO_Last_name": "Salazar",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/alexsalazar",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 170,
+          "Organization_name": "Citizen Health",
+          "CEO_First_name": "Farid",
+          "CEO_Last_name": "Vij",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/faridvij",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 171,
+          "Organization_name": "Mundial Media",
+          "CEO_First_name": "Tony",
+          "CEO_Last_name": "Gonzalez",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/tonygonzalez",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 172,
+          "Organization_name": "Bedrock Robotics",
+          "CEO_First_name": "Boris",
+          "CEO_Last_name": "Sofman",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 173,
+          "Organization_name": "Arcade",
+          "CEO_First_name": "Mariam",
+          "CEO_Last_name": "Naficy",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 174,
+          "Organization_name": "Merciv",
+          "CEO_First_name": "Shaia",
+          "CEO_Last_name": "Erlbaum",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shaia-erlbaum",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 175,
+          "Organization_name": "Envive AI",
+          "CEO_First_name": "Aniket",
+          "CEO_Last_name": "Deosthali",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/aniketd/",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 176,
+          "Organization_name": "Dropzone AI",
+          "CEO_First_name": "Edward",
+          "CEO_Last_name": "Wu",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/edwardwu/",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 177,
+          "Organization_name": "Pantomath",
+          "CEO_First_name": "Somesh",
+          "CEO_Last_name": "Saxena",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/somesh-saxena",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 178,
+          "Organization_name": "Yourway Learning",
+          "CEO_First_name": "Jerry",
+          "CEO_Last_name": "Weissberg",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 179,
+          "Organization_name": "Altan",
+          "CEO_First_name": "Albert",
+          "CEO_Last_name": "Salgueda",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/albertsalgueda",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 180,
+          "Organization_name": "Ohai.ai",
+          "CEO_First_name": "Sheila",
+          "CEO_Last_name": "Marcelo",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/sheilamarcelo",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 181,
+          "Organization_name": "Alembic",
+          "CEO_First_name": "Tomás",
+          "CEO_Last_name": "Puig",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/tomaspuig",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 182,
+          "Organization_name": "Science On Call",
+          "CEO_First_name": "Andy",
+          "CEO_Last_name": "Freivogel",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 183,
+          "Organization_name": "Sundial",
+          "CEO_First_name": "Julie",
+          "CEO_Last_name": "Zhuo",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/julie-zhuo/",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 184,
+          "Organization_name": "AFRIKABAL",
+          "CEO_First_name": "Oghenetejiri",
+          "CEO_Last_name": "Jesse",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 185,
+          "Organization_name": "Hupside",
+          "CEO_First_name": "Jonathan",
+          "CEO_Last_name": "Aberman",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jonathanaberman",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 186,
+          "Organization_name": "ConCntric",
+          "CEO_First_name": "Steve",
+          "CEO_Last_name": "Dell’Orto",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 187,
+          "Organization_name": "Quack",
+          "CEO_First_name": "Nadav",
+          "CEO_Last_name": "Kemper",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/nadavkemper",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 188,
+          "Organization_name": "Raspberry AI",
+          "CEO_First_name": "Cheryl",
+          "CEO_Last_name": "Liu",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/cheryl-liu",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 189,
+          "Organization_name": "Delphi",
+          "CEO_First_name": "Dara",
+          "CEO_Last_name": "Ladjevardian",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/dara-ladjevardian",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 190,
+          "Organization_name": "Cascala Health",
+          "CEO_First_name": "Matt",
+          "CEO_Last_name": "Murphy",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/matt-a-murphy",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 191,
+          "Organization_name": "Aurelian",
+          "CEO_First_name": "Max",
+          "CEO_Last_name": "Keenan",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 192,
+          "Organization_name": "Layer AI",
+          "CEO_First_name": "Volkan",
+          "CEO_Last_name": "Gurel",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/volkangurel",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 193,
+          "Organization_name": "Rox",
+          "CEO_First_name": "Ishan",
+          "CEO_Last_name": "Mukherjee",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/ishanmukherjee",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 194,
+          "Organization_name": "Unframe",
+          "CEO_First_name": "Shay",
+          "CEO_Last_name": "Levi",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/shay-levi",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 195,
+          "Organization_name": "Eve Security",
+          "CEO_First_name": "Jayanth",
+          "CEO_Last_name": "M.",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/jayanthm",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 196,
+          "Organization_name": "Develop Health",
+          "CEO_First_name": "Mel",
+          "CEO_Last_name": "van Londen",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 197,
+          "Organization_name": "SchoolAI",
+          "CEO_First_name": "Caleb",
+          "CEO_Last_name": "Hicks",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/caleb-hicks",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 198,
+          "Organization_name": "Mana.bio",
+          "CEO_First_name": "Yogev",
+          "CEO_Last_name": "Debbi",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 199,
+          "Organization_name": "FINNY",
+          "CEO_First_name": "Eden",
+          "CEO_Last_name": "Ovadia",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/eden-ovadia",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 200,
+          "Organization_name": "Mazlo",
+          "CEO_First_name": "Kian",
+          "CEO_Last_name": "Alavi",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/kianalavi",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 201,
+          "Organization_name": "Perle AI",
+          "CEO_First_name": "Ahmed",
+          "CEO_Last_name": "Rashad",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/ahmed-rashad",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 202,
+          "Organization_name": "Pillar Security",
+          "CEO_First_name": "Dor",
+          "CEO_Last_name": "Sarig",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 203,
+          "Organization_name": "illumicell AI",
+          "CEO_First_name": "Michel",
+          "CEO_Last_name": "Bielecki",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 204,
+          "Organization_name": "Dyania Health",
+          "CEO_First_name": "Eirini",
+          "CEO_Last_name": "Schlosser",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 205,
+          "Organization_name": "Myriad AI",
+          "CEO_First_name": "Ralf",
+          "CEO_Last_name": "Schonherr",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 206,
+          "Organization_name": "Range",
+          "CEO_First_name": "Fahad",
+          "CEO_Last_name": "Hassan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/fahadhassan",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 207,
+          "Organization_name": "Arva AI",
+          "CEO_First_name": "Rhim",
+          "CEO_Last_name": "Shah",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 208,
+          "Organization_name": "Amigo AI",
+          "CEO_First_name": "Ali",
+          "CEO_Last_name": "Khokhar",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/ali-khokhar",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 209,
+          "Organization_name": "Zinnia",
+          "CEO_First_name": "Lauren",
+          "CEO_Last_name": "Marturano",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/lauren-goodell",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 210,
+          "Organization_name": "Flai",
+          "CEO_First_name": "Ari",
+          "CEO_Last_name": "Polakof",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 211,
+          "Organization_name": "Bonsai Health",
+          "CEO_First_name": "Travis",
+          "CEO_Last_name": "Schneider",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/travisschneider",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 212,
+          "Organization_name": "Revv",
+          "CEO_First_name": "Adi",
+          "CEO_Last_name": "Bathla",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 213,
+          "Organization_name": "Exostellar",
+          "CEO_First_name": "Tony",
+          "CEO_Last_name": "Shakib",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 214,
+          "Organization_name": "Chalk",
+          "CEO_First_name": "Marc",
+          "CEO_Last_name": "Freed-Finnegan",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 215,
+          "Organization_name": "Nectir",
+          "CEO_First_name": "Kavitta",
+          "CEO_Last_name": "Ghai",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/kavittaghai",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 216,
+          "Organization_name": "(Re)vive",
+          "CEO_First_name": "Allison",
+          "CEO_Last_name": "Lee",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 217,
+          "Organization_name": "Vermillio",
+          "CEO_First_name": "Dan",
+          "CEO_Last_name": "Neely",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 218,
+          "Organization_name": "Pathwork",
+          "CEO_First_name": "Ian",
+          "CEO_Last_name": "Levinsky",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 219,
+          "Organization_name": "Cathoven",
+          "CEO_First_name": "Erdi",
+          "CEO_Last_name": "Tac",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/erditac",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 220,
+          "Organization_name": "82º Arctic",
+          "CEO_First_name": "Daniel",
+          "CEO_Last_name": "Saglam",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/danielsaglam",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 221,
+          "Organization_name": "AIM",
+          "CEO_First_name": "Adam",
+          "CEO_Last_name": "Sadilek",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/adamsadilek",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 222,
+          "Organization_name": "Vouched",
+          "CEO_First_name": "Peter",
+          "CEO_Last_name": "Horadan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/peterhoradan",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 223,
+          "Organization_name": "BlastPoint",
+          "CEO_First_name": "Alison",
+          "CEO_Last_name": "Alvarez",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 224,
+          "Organization_name": "Springbok Analytics",
+          "CEO_First_name": "Scott",
+          "CEO_Last_name": "Magargee",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 225,
+          "Organization_name": "Firestorm",
+          "CEO_First_name": "Daniel",
+          "CEO_Last_name": "Magy",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/danmagy",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 226,
+          "Organization_name": "Sohar Health",
+          "CEO_First_name": "Ashish",
+          "CEO_Last_name": "Mandavia",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 227,
+          "Organization_name": "Onyx",
+          "CEO_First_name": "Yuhong",
+          "CEO_Last_name": "Sun",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/yuhongsun",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 228,
+          "Organization_name": "New Generation",
+          "CEO_First_name": "Adam",
+          "CEO_Last_name": "Behrens",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/adam-behrens",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 229,
+          "Organization_name": "Aurelius Systems",
+          "CEO_First_name": "Michael",
+          "CEO_Last_name": "LaFramboise",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 230,
+          "Organization_name": "Qualified Health",
+          "CEO_First_name": "Justin",
+          "CEO_Last_name": "Norden",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 231,
+          "Organization_name": "Sully.ai",
+          "CEO_First_name": "Ahmed",
+          "CEO_Last_name": "Omar",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/ahmed-omar",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 232,
+          "Organization_name": "Xscape Photonics",
+          "CEO_First_name": "Vivek",
+          "CEO_Last_name": "Raghunathan",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/vivek-raghunathan",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 233,
+          "Organization_name": "Conversion",
+          "CEO_First_name": "Neil",
+          "CEO_Last_name": "Tewari",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 234,
+          "Organization_name": "SignalRank",
+          "CEO_First_name": "Keith",
+          "CEO_Last_name": "Teare",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/keithteare",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 235,
+          "Organization_name": "Persona AI",
+          "CEO_First_name": "Nic",
+          "CEO_Last_name": "Radford",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/nicolaus-radford",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 236,
+          "Organization_name": "Nodes",
+          "CEO_First_name": "Saad",
+          "CEO_Last_name": "Bin Shafiq",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/saad-bin-shafiq",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 237,
+          "Organization_name": "Freed",
+          "CEO_First_name": "Erez",
+          "CEO_Last_name": "Druk",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 238,
+          "Organization_name": "Arena",
+          "CEO_First_name": "Pratap",
+          "CEO_Last_name": "Ranade",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 239,
+          "Organization_name": "Pitz",
+          "CEO_First_name": "Fernando",
+          "CEO_Last_name": "Mendívil",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 240,
+          "Organization_name": "Unify",
+          "CEO_First_name": "Austin",
+          "CEO_Last_name": "Hughes",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/austin-hughes",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 241,
+          "Organization_name": "Tempo",
+          "CEO_First_name": "Eduardo",
+          "CEO_Last_name": "Latache",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 242,
+          "Organization_name": "Toma",
+          "CEO_First_name": "Monik",
+          "CEO_Last_name": "Pamecha",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 243,
+          "Organization_name": "Reveal Technology",
+          "CEO_First_name": "Garrett",
+          "CEO_Last_name": "Smith",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/garrett-smith",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 244,
+          "Organization_name": "Protege",
+          "CEO_First_name": "Bobby",
+          "CEO_Last_name": "Samuels",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 245,
+          "Organization_name": "Heron Data",
+          "CEO_First_name": "Johannes",
+          "CEO_Last_name": "Jaeckle",
+          "CEO_LinkedIn": "https://www.linkedin.com/in/johannes-jaeckle",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 246,
+          "Organization_name": "Vapi",
+          "CEO_First_name": "Jordan",
+          "CEO_Last_name": "Dearsley",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "row_number": 247,
+          "Organization_name": "OpenMind",
+          "CEO_First_name": "Jan",
+          "CEO_Last_name": "Liphardt",
+          "CEO_LinkedIn": "",
+          "Description": "",
+          "City": "",
+          "Country": "",
+          "Last_funding_type": "",
+          "Last_funding_date": "",
+          "Hook": "",
+          "Founder_detail": "",
+          "LinkedIn_message": "",
+          "Sent_to_HeyReach": "",
+          "Domain": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Parse Message": {
+      "main": [
+        [
+          {
+            "node": "Update LinkedIn Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update LinkedIn Message": {
+      "main": [
+        [
+          {
+            "node": "Send to HeyReach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to HeyReach": {
+      "main": [
+        [
+          {
+            "node": "Mark Sent in Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Sent in Sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Prospects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter: Has LinkedIn + Not Sent1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Prospects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Prospects": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Layer 2 — Copywriter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Layer 2 — Copywriter1": {
+      "main": [
+        [
+          {
+            "node": "Parse Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter: Has LinkedIn + Not Sent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c277d342-ee0f-49a8-9171-a7f9892c79a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "51ab96d1ae2f2c64c011651eae2a0f82f5afbf7edd8121933f0fd9d575244c15"
+  },
+  "nodeGroups": [],
+  "id": "P4wfkCDBm6r7n4QU",
+  "tags": []
+}

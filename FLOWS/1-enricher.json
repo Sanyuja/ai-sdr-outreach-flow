@@ -1,0 +1,507 @@
+{
+  "name": "AI SDR — Prospect Enricher",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "mode": "list",
+          "cachedResultName": "AI SDR prospect list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        816
+      ],
+      "id": "3ae3db98-4864-4d40-aec2-4e81a65c8719",
+      "name": "Read Prospect Sheet1",
+      "notesInFlow": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ekmfU0LHEc23MImX",
+          "name": "Google Sheets account sanyuja"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "has-org-name",
+              "leftValue": "={{ $json[\"Organization_name\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "not-enriched",
+              "leftValue": "={{ $json.CEO_LinkedIn }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        816
+      ],
+      "id": "0667aa25-3fb3-456f-b154-4622c86cf6d2",
+      "name": "Filter: Has Name + Not Yet Enriched1"
+    },
+    {
+      "parameters": {
+        "maxItems": 25
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        816
+      ],
+      "id": "47108464-639b-4e57-8806-b7c101fc10cf",
+      "name": "Limit (test: 5)1"
+    },
+    {
+      "parameters": {
+        "batchSize": 25,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1216,
+        816
+      ],
+      "id": "0e2e0539-1232-4e66-ae1b-a282d25b0515",
+      "name": "Loop Over Prospects1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini-search-preview",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a B2B go-to-market research analyst. Given a company name, you find structured data about the company, its CEO/founder, AND its sales motion — specifically WHO the company sells to and WHY reaching those buyers at scale is hard. This research feeds a cold-outreach system that pitches custom AI SDR builds, so the GTM fields (ICP, Pain_point, Hook, Founder_detail) are the most important. Be accurate and specific — never vague, never generic. Prefer real, verifiable detail. When a fact is genuinely unavailable, make a well-reasoned inference from the company's category, stage, and product rather than leaving a field blank — but never fabricate a specific named fact (like a person, date, or dollar figure) you cannot support.",
+              "role": "system"
+            },
+            {
+              "content": "=Research this company and return structured GTM intelligence:\n\nCompany name: {{ $json[\"Organization_name\"] }}\n\nReturn STRICTLY as JSON (no markdown, no extra text). Every field must have a value — never return an empty string. If a fact is unavailable, infer a sensible value from the company's category, stage, and product (but never fabricate a specific named person, date, or dollar amount). Include the original input value as Organization_name in the returned JSON:\n{\n  \"Organization_name\": \"{{ $json[\"Organization_name\"] }}\",\n  \"Domain\": \"company website domain e.g. acme.com\",\n  \"CEO_First_name\": \"first name of CEO or founder\",\n  \"CEO_Last_name\": \"last name of CEO or founder\",\n  \"CEO_LinkedIn\": \"full linkedin.com/in/... URL of CEO\",\n  \"Description\": \"1-2 sentences: what the company does and the value it delivers\",\n  \"City\": \"city of HQ\",\n  \"Country\": \"country of HQ\",\n  \"Last_funding_type\": \"e.g. Series A, Seed, Series B\",\n  \"Last_funding_date\": \"YYYY-MM-DD format\",\n  \"ICP\": \"THE most important field. Who this company SELLS TO. Be concrete and specific: buyer job titles + the type of company or person that buys. e.g. 'VPs of Engineering and CTOs at Series A-C SaaS startups' or 'independent landlords managing 5-50 rental units' or 'heads of compliance at mid-market banks'. This is who Erica's AI SDR would target on their behalf.\",\n  \"Pain_point\": \"The specific go-to-market / customer-acquisition challenge this company faces in REACHING its ICP — the problem a tailored AI SDR would solve. e.g. 'their buyers are senior, niche and not reachable via ads, so they rely on slow manual 1:1 outreach' or 'long enterprise sales cycles with hard-to-identify decision makers'. Tie it to their actual buyer and motion.\",\n  \"Hook\": \"one specific, non-obvious, verifiable detail about the company useful for cold outreach. NOT a restatement of Description. e.g. a standout metric, an unusual origin, a notable customer, a record-setting raise.\",\n  \"Founder_detail\": \"one specific, memorable detail about the founder useful for personalization. e.g. a prior exit, published research, a public stance, an unusual background or path.\",\n  \"Product_type\": \"one of: SaaS, Marketplace, API/Infrastructure, Hardware, Professional Services, Consumer App, or Data/Analytics — pick the single best fit for this company\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1392,
+        560
+      ],
+      "id": "713f95e1-1de6-4a15-8899-4b22f3e1ac08",
+      "name": "Researcher AI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "TA3VNMaLGGHjufVV",
+          "name": "Erica's OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// robust parse + normalize keys\nconst input = $input.item.json || {};\n\nconst normalized = {};\nfor (const k of Object.keys(input)) {\n  normalized[k.trim()] = input[k];\n}\n\nfunction findOrg(obj) {\n  const candidates = ['Organization_name', 'Organization name', 'Organization', 'organization_name', 'organization'];\n  for (const c of candidates) {\n    if (Object.prototype.hasOwnProperty.call(obj, c) && obj[c]) return obj[c];\n  }\n  for (const k of Object.keys(obj)) {\n    if (k.trim() === 'Organization_name' && obj[k]) return obj[k];\n  }\n  return '';\n}\n\nlet raw = '';\nif (input?.choices?.[0]) {\n  raw = input.choices[0].message?.content ?? input.choices[0].text ?? '';\n} else if (input?.message?.content || input?.message?.text) {\n  raw = input.message.content ?? input.message.text;\n} else if (input?.output?.[0]) {\n  raw = input.output[0].content ?? input.output[0].text ?? '';\n} else {\n  for (const k of Object.keys(input)) {\n    if (typeof input[k] === 'string' && input[k].trim()) { raw = input[k]; break; }\n    if (input[k] && typeof input[k] === 'object') {\n      const nested = input[k].content ?? input[k].text;\n      if (typeof nested === 'string' && nested.trim()) { raw = nested; break; }\n    }\n  }\n}\n\nlet parsed = {};\nif (raw) {\n  const fenceMatch = raw.match(/```(?:json)?\\s*([\\s\\S]*?)\\s*```/);\n  const toParse = fenceMatch ? fenceMatch[1].trim() : raw.trim();\n  try { parsed = JSON.parse(toParse); } catch { try { parsed = JSON.parse(raw); } catch { parsed = {}; } }\n}\n\nif (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {\n  parsed = {};\n}\n\nlet orgName = parsed.Organization_name || parsed['Organization name'] || '';\nif (!orgName) orgName = findOrg(normalized) || findOrg(input) || '';\n\nconst out = Object.assign({}, parsed);\nout.Organization_name = orgName;\n\nreturn { json: out };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        816
+      ],
+      "id": "ddfbf8e3-60aa-4ad5-a441-c9f226227909",
+      "name": "Parse Enrichment1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s",
+          "mode": "list",
+          "cachedResultName": "AI SDR prospect list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKQ4sNunNurCemM1xG176wjypNPmH2q7fU0zVqOrQ-s/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "Organization_name": "={{ $json.Organization_name}}",
+            "CEO_First_name": "={{ $json.CEO_First_name }}",
+            "CEO_Last_name": "={{ $json.CEO_Last_name }}",
+            "CEO_LinkedIn": "={{ $json.CEO_LinkedIn }}",
+            "Description": "={{ $json.Description }}",
+            "City": "={{ $json.City }}",
+            "Country": "={{ $json.Country }}",
+            "Last_funding_type": "={{ $json.Last_funding_type }}",
+            "Last_funding_date": "={{ $json.Last_funding_date }}",
+            "ICP": "={{ $json.ICP }}",
+            "Pain_point": "={{ $json.Pain_point }}",
+            "Hook": "={{ $json.Hook }}",
+            "Founder_detail": "={{ $json.Founder_detail }}",
+            "Product_type": "={{ $json.Product_type }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "Organization_name"
+          ],
+          "schema": [
+            {
+              "id": "Organization_name",
+              "displayName": "Organization_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CEO_First_name",
+              "displayName": "CEO_First_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CEO_Last_name",
+              "displayName": "CEO_Last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CEO_LinkedIn",
+              "displayName": "CEO_LinkedIn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last_funding_type",
+              "displayName": "Last_funding_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last_funding_date",
+              "displayName": "Last_funding_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hook",
+              "displayName": "Hook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Founder_detail",
+              "displayName": "Founder_detail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ICP",
+              "displayName": "ICP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pain_point",
+              "displayName": "Pain_point",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product_type",
+              "displayName": "Product_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn_message",
+              "displayName": "LinkedIn_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sent_to_HeyReach",
+              "displayName": "Sent_to_HeyReach",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1904,
+        816
+      ],
+      "id": "e5814121-db81-441f-95d3-812259528993",
+      "name": "Update Sheet Row1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ekmfU0LHEc23MImX",
+          "name": "Google Sheets account sanyuja"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        752,
+        288
+      ],
+      "id": "8b4c055b-959c-4e53-83f4-2979b72c1f6e",
+      "name": "Run Enricher"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Read Prospect Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Filter: Has Name + Not Yet Enriched1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter: Has Name + Not Yet Enriched1": {
+      "main": [
+        [
+          {
+            "node": "Limit (test: 5)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit (test: 5)1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Prospects1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Prospects1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Researcher AI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Researcher AI1": {
+      "main": [
+        [
+          {
+            "node": "Parse Enrichment1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Enrichment1": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet Row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Sheet Row1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Prospects1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Enricher": {
+      "main": [
+        [
+          {
+            "node": "Read Prospect Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2b8822bf-837a-46e3-ace4-23006db41c22",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "51ab96d1ae2f2c64c011651eae2a0f82f5afbf7edd8121933f0fd9d575244c15"
+  },
+  "nodeGroups": [],
+  "id": "rWwR7FdYF04a5h0H",
+  "tags": []
+}
