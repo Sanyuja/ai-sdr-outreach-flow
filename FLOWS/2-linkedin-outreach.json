@@ -4,7 +4,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const content = $input.item.json?.message?.content ?? {};\nconst now = new Date().toISOString().split('T')[0];\n\nreturn {\n  json: {\n    Organization_name: content.Organization_name || '',\n    CEO_LinkedIn: content.CEO_LinkedIn || '',\n    CEO_First_name: content.CEO_First_name || '',\n    CEO_Last_name: content.CEO_Last_name || '',\n    LinkedIn_message: content.connection_request || '',\n    First_message: content.first_message || '',\n    First_nudge: content.first_nudge || '',\n    Second_nudge: content.second_nudge || '',\n    message_stage: 'connection_request_generated',\n    messages_generated_date: now\n  }\n};"
+        "jsCode": "const content = $input.item.json?.message?.content ?? {};\nconst src = $('Loop Over Prospects').item.json ?? {};\nconst now = new Date().toISOString().split('T')[0];\n\n// Personalized snapshot link. After deploying snapshot-app, set SNAPSHOT_BASE to your Vercel URL.\nconst SNAPSHOT_BASE = 'https://erica-sdr-snapshot.vercel.app';\nconst payload = {\n  c: content.Organization_name || src.Organization_name || '',\n  f: content.CEO_First_name || src.CEO_First_name || '',\n  icp: src.ICP || '',\n  p: src.Pain_point || '',\n  h: src.Hook || '',\n  pt: src.Product_type || ''\n};\nconst encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');\nconst snapshot_url = SNAPSHOT_BASE + '/s?d=' + encoded;\nconst NL = String.fromCharCode(10);\nconst firstMessage = (content.first_message || '').trim() + NL + NL + snapshot_url;\n\nreturn {\n  json: {\n    Organization_name: content.Organization_name || '',\n    CEO_LinkedIn: content.CEO_LinkedIn || '',\n    CEO_First_name: content.CEO_First_name || '',\n    CEO_Last_name: content.CEO_Last_name || '',\n    LinkedIn_message: content.connection_request || '',\n    First_message: firstMessage,\n    First_nudge: content.first_nudge || '',\n    Second_nudge: content.second_nudge || '',\n    snapshot_url: snapshot_url,\n    message_stage: 'connection_request_generated',\n    messages_generated_date: now\n  }\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -39,6 +39,7 @@
             "First_message": "={{ $json.First_message }}",
             "First_nudge": "={{ $json.First_nudge }}",
             "Second_nudge": "={{ $json.Second_nudge }}",
+            "snapshot_url": "={{ $json.snapshot_url }}",
             "message_stage": "={{ $json.message_stage }}",
             "messages_generated_date": "={{ $json.messages_generated_date }}"
           },
@@ -89,6 +90,16 @@
             {
               "id": "Second_nudge",
               "displayName": "Second_nudge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "snapshot_url",
+              "displayName": "snapshot_url",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -337,7 +348,7 @@
               "role": "system"
             },
             {
-              "content": "=Write four personalized LinkedIn messages from Erica to this founder. All four should feel like a real, evolving conversation — coherent, warm, and never repetitive. Each message should add something new rather than restate what came before.\n\nCEO: {{ $json.CEO_First_name }} {{ $json.CEO_Last_name }}\nCompany: {{ $json.Organization_name }}\nFounder detail (use to personalize — it's about the person): {{ $json.Founder_detail }}\nHook (non-obvious company insight): {{ $json.Hook }}\nCompany description (use to understand their ICP and buyers): {{ $json.Description }}\n\nMESSAGE 1 — connection_request (STRICT: under 300 characters total, including spaces):\nThis is the note attached to a LinkedIn connection request. Lead with something specific about the FOUNDER (use Founder_detail) — sound like you've been following them, not just did a quick search. Weave in the Hook naturally as an extension of who they are. End with a soft one-line CTA like 'open to connect'. First name only. Never start with 'I'. No exclamation points. No em dashes.\n\nMESSAGE 2 — first_message (sent after they accept the connection):\nThis message has one job: make them feel like Erica already understands their business and has built something specifically for them. Use Description to identify exactly who their buyers are — name them specifically (e.g. 'CFOs at mid-market SaaS companies' or 'procurement leads at logistics firms'). Then say Erica built a custom AI SDR system that finds and reaches exactly that type of buyer automatically — and that she can build the same for them. Make it feel like the ICP call-out is the hook, not the AI pitch. The AI SDR is the solution to the ICP problem they already know they have. 2–3 short sentences. Direct, warm, zero fluff. Never start with 'I'.\n\nMESSAGE 3 — first_nudge (gentle follow-up if no reply to first_message):\nTry a completely different angle — don't repeat anything from messages 1 or 2. Maybe ask a genuine question about their current outreach approach, or name a pain point founders in their space typically face. Under 3 lines. Low pressure, no urgency.\n\nMESSAGE 4 — second_nudge (last attempt):\nVery short — 1 to 2 lines max. Acknowledge they're probably slammed. One fresh thought: either a result Erica has seen, an easy question, or just an open door. Make it easy to say yes or no.\n\nRules for all messages: First name only. No exclamation points. No em dashes. No fluff. No generic openers like 'I noticed' or 'I came across'. Never start with 'I'.\n\nReturn strictly as JSON (no markdown, no extra text):\n{\n  \"Organization_name\": \"{{ $json.Organization_name }}\",\n  \"CEO_LinkedIn\": \"{{ $json.CEO_LinkedIn }}\",\n  \"CEO_First_name\": \"{{ $json.CEO_First_name }}\",\n  \"CEO_Last_name\": \"{{ $json.CEO_Last_name }}\",\n  \"connection_request\": \"...\",\n  \"first_message\": \"...\",\n  \"first_nudge\": \"...\",\n  \"second_nudge\": \"...\"\n}\n"
+              "content": "=Write four personalized LinkedIn messages from Erica to this founder. All four should feel like a real, evolving conversation — coherent, warm, and never repetitive. Each message should add something new rather than restate what came before.\n\nCEO: {{ $json.CEO_First_name }} {{ $json.CEO_Last_name }}\nCompany: {{ $json.Organization_name }}\nFounder detail (use to personalize — it's about the person): {{ $json.Founder_detail }}\nHook (non-obvious company insight): {{ $json.Hook }}\nCompany description (use to understand their ICP and buyers): {{ $json.Description }}\n\nMESSAGE 1 — connection_request (STRICT: under 300 characters total, including spaces):\nThis is the note attached to a LinkedIn connection request. Lead with something specific about the FOUNDER (use Founder_detail) — sound like you've been following them, not just did a quick search. Weave in the Hook naturally as an extension of who they are. End with a soft one-line CTA like 'open to connect'. First name only. Never start with 'I'. No exclamation points. No em dashes.\n\nMESSAGE 2 — first_message (sent after they accept the connection):\nThis message has one job: make them feel like Erica already understands their business and has built something specifically for them. Use Description to identify exactly who their buyers are — name them specifically (e.g. 'CFOs at mid-market SaaS companies' or 'procurement leads at logistics firms'). Then say Erica built a custom AI SDR system that finds and reaches exactly that type of buyer automatically — and that she can build the same for them. Make it feel like the ICP call-out is the hook, not the AI pitch. The AI SDR is the solution to the ICP problem they already know they have. 2–3 short sentences. Direct, warm, zero fluff. Never start with 'I'. End first_message with ONE short standalone line that introduces a personalized snapshot you made for them, phrased as a lead-in that ends with a colon (for example: 'Made you a quick snapshot of what this could look like for {company}:'). Do NOT write any link or URL yourself. A personalized link is attached automatically on the next line.\n\nMESSAGE 3 — first_nudge (gentle follow-up if no reply to first_message):\nTry a completely different angle — don't repeat anything from messages 1 or 2. Maybe ask a genuine question about their current outreach approach, or name a pain point founders in their space typically face. Under 3 lines. Low pressure, no urgency.\n\nMESSAGE 4 — second_nudge (last attempt):\nVery short — 1 to 2 lines max. Acknowledge they're probably slammed. One fresh thought: either a result Erica has seen, an easy question, or just an open door. Make it easy to say yes or no.\n\nRules for all messages: First name only. No exclamation points. No em dashes. No fluff. No generic openers like 'I noticed' or 'I came across'. Never start with 'I'.\n\nReturn strictly as JSON (no markdown, no extra text):\n{\n  \"Organization_name\": \"{{ $json.Organization_name }}\",\n  \"CEO_LinkedIn\": \"{{ $json.CEO_LinkedIn }}\",\n  \"CEO_First_name\": \"{{ $json.CEO_First_name }}\",\n  \"CEO_Last_name\": \"{{ $json.CEO_Last_name }}\",\n  \"connection_request\": \"...\",\n  \"first_message\": \"...\",\n  \"first_nudge\": \"...\",\n  \"second_nudge\": \"...\"\n}\n"
             }
           ]
         },
@@ -355,7 +366,7 @@
       "credentials": {
         "openAiApi": {
           "id": "TA3VNMaLGGHjufVV",
-          "name": "Erica's OpenAi account"
+          "name": "[YOUR_OPENAI_CREDENTIAL]"
         }
       }
     },
